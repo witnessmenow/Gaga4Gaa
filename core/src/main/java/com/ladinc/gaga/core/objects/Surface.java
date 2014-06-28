@@ -16,7 +16,7 @@ import com.ladinc.gaga.core.utilities.BodyEditorLoader;
 import com.ladinc.gaga.core.utilities.GenericEnums;
 import com.ladinc.gaga.core.utilities.GenericEnums.Side;
 
-public class Rink 
+public class Surface 
 {
 	private static int PIXELS_PER_METER = 10;
 	
@@ -32,15 +32,15 @@ public class Rink
 	public Goal leftGoal;
 	public Goal rightGoal;
 	
-	public Rink(World world, float worldHeight, float worldWidth, Vector2 center)
+	public Surface(World world, float worldHeight, float worldWidth, Vector2 center)
 	{
-		BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("PBE/iceRink2.json"));
-		rinkImage = Rink.getRinkSprite();
+		//BodyEditorLoader loader = new BodyEditorLoader(Gdx.files.internal("PBE/iceRink2.json"));
+		rinkImage = Surface.getRinkSprite();
 		rinkImage.setPosition(0, 0);
 		
 		BodyDef bd = new BodyDef();
 	    bd.position.set(0, 0);
-	    //bd.type = BodyType.DynamicBody;
+	    bd.type = BodyType.DynamicBody;
 	    
 	    FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.density = 1.0f;
@@ -52,7 +52,7 @@ public class Rink
 		
 		this.body = world.createBody(bd);
 		
-		loader.attachFixture(body, "iceRink", fixtureDef, 192);
+		//loader.attachFixture(body, "iceRink", fixtureDef, 192);
 		
 		leftGoal = new Goal(world, 30f, yAxisCenter, Side.Home);
 		rightGoal = new Goal(world, worldWidth - 30f, yAxisCenter, Side.Away);
@@ -61,14 +61,14 @@ public class Rink
 	
 	private static Sprite getRinkSprite()
     {
-    	Texture rinkTexture = new Texture(Gdx.files.internal("Images/Objects/IceRinkOffSet1.png"));
+    	Texture rinkTexture = new Texture(Gdx.files.internal("grassMowed.png"));
     	
     	return new Sprite(rinkTexture);
     }
 	
 	public Vector2 getPuckStartingPoint()
 	{
-		return new Vector2(this.worldCenter.x, Rink.yAxisCenter);
+		return new Vector2(this.worldCenter.x, Surface.yAxisCenter);
 	}
 	
 	int lastUsedHomePosition;
@@ -85,17 +85,17 @@ public class Rink
 		homeStartingPositionList = new ArrayList<StartingPosition>();
 		
 		//Face Off
-		homeStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x - 7.6f, Rink.yAxisCenter), (float)Math.toRadians(180 - 15)));
+		homeStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x - 7.6f, Surface.yAxisCenter), (float)Math.toRadians(180 - 15)));
 		homeStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x - 16.8f, 36.3f), (float)Math.toRadians(180)));
 		homeStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x - 16.8f, 83.2f), (float)Math.toRadians(180)));
-		homeStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x - 56f, Rink.yAxisCenter), (float)Math.toRadians(180)));
+		homeStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x - 56f, Surface.yAxisCenter), (float)Math.toRadians(180)));
 		
 		awayStartingPositionList = new ArrayList<StartingPosition>();
 		
-		awayStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x + 7.6f, Rink.yAxisCenter), (float)Math.toRadians(15)));
+		awayStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x + 7.6f, Surface.yAxisCenter), (float)Math.toRadians(15)));
 		awayStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x + 16.8f, 36.3f), (float)Math.toRadians(0)));
 		awayStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x + 16.8f, 83.2f), (float)Math.toRadians(0)));
-		awayStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x + 56f, Rink.yAxisCenter), (float)Math.toRadians(0)));
+		awayStartingPositionList.add(new StartingPosition(new Vector2(this.worldCenter.x + 56f, Surface.yAxisCenter), (float)Math.toRadians(0)));
 	}
 	
 	private List<StartingPosition> homeStartingPositionList;

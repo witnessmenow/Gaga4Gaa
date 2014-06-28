@@ -19,7 +19,7 @@ import com.ladinc.gaga.core.collision.CollisionHelper;
 import com.ladinc.gaga.core.controls.IControls;
 import com.ladinc.gaga.core.objects.HockeyPlayer;
 import com.ladinc.gaga.core.objects.Puck;
-import com.ladinc.gaga.core.objects.Rink;
+import com.ladinc.gaga.core.objects.Surface;
 import com.ladinc.gaga.core.utilities.DebugUtilities;
 import com.ladinc.gaga.core.utilities.GenericEnums.Side;
 import com.ladinc.gaga.core.Gaga;
@@ -48,7 +48,7 @@ public class Pitch implements Screen
     
     //Game Actor Objects
     public List<HockeyPlayer> hockeyPlayerList;
-    private Rink rink;
+    private Surface rink;
     private Puck puck;
     private List<SimpleAi> AiList;
     
@@ -207,7 +207,7 @@ public class Pitch implements Screen
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1);
         //TODO: Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
         
-        //this.rink.rinkImage.draw(spriteBatch);
+        this.rink.rinkImage.draw(spriteBatch);
         
         //we want other players sprites to be drawn on top of the indentifier
         for(HockeyPlayer hp: hockeyPlayerList)
@@ -289,7 +289,7 @@ public class Pitch implements Screen
 	public void show() {
 		world = new World(new Vector2(0.0f, 0.0f), true);
 		world.setContactListener(this.colHelper);
-		//this.rink = new Rink(world, this.worldHeight, this.worldWidth, this.center);
+		this.rink = new Surface(world, this.worldHeight, this.worldWidth, this.center);
 		
 		spriteBatch = new SpriteBatch();
 		

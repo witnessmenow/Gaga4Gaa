@@ -17,7 +17,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.ladinc.gaga.core.ai.SimpleAi;
 import com.ladinc.gaga.core.collision.CollisionHelper;
 import com.ladinc.gaga.core.controls.IControls;
-import com.ladinc.gaga.core.objects.HockeyPlayer;
+import com.ladinc.gaga.core.objects.Player;
 import com.ladinc.gaga.core.objects.Puck;
 import com.ladinc.gaga.core.objects.Surface;
 import com.ladinc.gaga.core.utilities.DebugUtilities;
@@ -47,7 +47,7 @@ public class Pitch implements Screen
     private Gaga game;
     
     //Game Actor Objects
-    public List<HockeyPlayer> hockeyPlayerList;
+    public List<Player> hockeyPlayerList;
     private Surface rink;
     private Puck puck;
     private List<SimpleAi> AiList;
@@ -159,7 +159,7 @@ public class Pitch implements Screen
 	        	ai.movementFollowPuck(ai.player.body.getWorldCenter(), this.puck.body.getWorldCenter());
 	        }
 	        
-	        for(HockeyPlayer hp: hockeyPlayerList)
+	        for(Player hp: hockeyPlayerList)
 			{
 	        	if(processingGoal)
 	        	{
@@ -210,12 +210,12 @@ public class Pitch implements Screen
         this.rink.rinkImage.draw(spriteBatch);
         
         //we want other players sprites to be drawn on top of the indentifier
-        for(HockeyPlayer hp: hockeyPlayerList)
+        for(Player hp: hockeyPlayerList)
 		{
-        	hp.updateIdentiferSprite(spriteBatch);
+        	//hp.updateIdentiferSprite(spriteBatch);
 		}
         
-        for(HockeyPlayer hp: hockeyPlayerList)
+        for(Player hp: hockeyPlayerList)
 		{
         	hp.updateSprite(spriteBatch);
 		}
@@ -245,7 +245,7 @@ public class Pitch implements Screen
 	
 	private void restartPositions()
 	{
-        for(HockeyPlayer hp: hockeyPlayerList)
+        for(Player hp: hockeyPlayerList)
 		{
         	hp.resetPosition();
 		}
@@ -271,7 +271,7 @@ public class Pitch implements Screen
 		
 		int nextPlayerNumber = this.hockeyPlayerList.size() + 1;
 		
-		HockeyPlayer hp = new HockeyPlayer(world, nextPlayerNumber, side, ai, this.rink.getPlayerStartingPosition(side, nextPlayerNumber), this.camera);
+		Player hp = new Player(world, nextPlayerNumber, side, ai, this.rink.getPlayerStartingPosition(side, nextPlayerNumber), this.camera);
 		hockeyPlayerList.add(hp);
 		
 		ai.player = hp;
@@ -312,7 +312,7 @@ public class Pitch implements Screen
 		
 		if(hockeyPlayerList == null)
 		{
-			hockeyPlayerList= new ArrayList<HockeyPlayer>();		
+			hockeyPlayerList= new ArrayList<Player>();		
 		}
 		
 		int nextPlayerNumber = this.hockeyPlayerList.size() + 1;
@@ -322,7 +322,7 @@ public class Pitch implements Screen
 			Gdx.app.debug("Hockey Screen", "createPlayers() - looping through controllers");
 			
 			boolean controllerHasPlayer = false;
-			for(HockeyPlayer hp: hockeyPlayerList)
+			for(Player hp: hockeyPlayerList)
 			{
 				Gdx.app.debug("Hockey Screen", "createPlayers() - checking to see is controller already assigned");
 				 if(hp.controller == ic)
@@ -338,8 +338,8 @@ public class Pitch implements Screen
 					lastUsedSide = Side.Away;
 				
 				Gdx.app.debug("Hockey Screen", "createPlayers() - creating new player");
-				//hockeyPlayerList.add(new HockeyPlayer(world, nextPlayerNumber, lastUsedSide, ic, this.rink.getPlayerStartingPosition(lastUsedSide, nextPlayerNumber), this.camera));
-				//nextPlayerNumber++;
+				hockeyPlayerList.add(new Player(world, nextPlayerNumber, lastUsedSide, ic, this.rink.getPlayerStartingPosition(lastUsedSide, nextPlayerNumber), this.camera));
+				nextPlayerNumber++;
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 package com.ladinc.gaga.core.collision;
 
-import com.ladinc.gaga.core.objects.HockeyPlayer;
+import com.ladinc.gaga.core.objects.Player;
 import com.ladinc.gaga.core.utilities.GenericEnums.Side;
 
 public class CollisionInfo {
@@ -8,7 +8,7 @@ public class CollisionInfo {
 	public String text;
 	public CollisionObjectType type;
 	
-	public HockeyPlayer player;
+	public Player player;
 	
 	public Side side;
 	
@@ -26,7 +26,7 @@ public class CollisionInfo {
 		this.side = side;
 	}
 	
-	public CollisionInfo(String text, CollisionObjectType type, HockeyPlayer player)
+	public CollisionInfo(String text, CollisionObjectType type, Player player)
 	{
 		this.text = text;		
 		this.type = type;

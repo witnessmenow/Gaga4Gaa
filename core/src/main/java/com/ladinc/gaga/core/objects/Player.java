@@ -22,7 +22,7 @@ import com.ladinc.gaga.core.controls.IControls;
 import com.ladinc.gaga.core.utilities.GenericEnums.Identifier;
 import com.ladinc.gaga.core.utilities.GenericEnums.Side;
 
-public class HockeyPlayer {
+public class Player {
 	
 	float playerSize = 3f;
 	
@@ -31,12 +31,10 @@ public class HockeyPlayer {
 	private float stickPower = 5000f;
 
 	public Sprite sprite;
-	public Sprite stickSprite;
 	public Sprite identifierSprite;
 	
 	public Body body;
 	private World world;
-	public Body stick;
 	
 	public int playerNumber;
 	
@@ -51,7 +49,7 @@ public class HockeyPlayer {
 	
 	private MouseJoint movementJoint;
 	
-	public HockeyPlayer(World world, int number, Side side, IControls controller, StartingPosition startPos, OrthographicCamera camera)
+	public Player(World world, int number, Side side, IControls controller, StartingPosition startPos, OrthographicCamera camera)
 	{
 		playerNumber = number;
 		
@@ -69,12 +67,11 @@ public class HockeyPlayer {
 		
 		this.side = side;
 		
-		this.sprite = HockeyPlayer.getPlayerSprite(side);
-		this.stickSprite = HockeyPlayer.getStickSprite();
+		this.sprite = Player.getPlayerSprite(side);
 		Identifier ident = controller.getIdentifier();
 		if(ident != null)
 		{
-			this.identifierSprite = HockeyPlayer.getIdentifierSprite(ident);
+			//this.identifierSprite = HockeyPlayer.getIdentifierSprite(ident);
 		}
 		else
 		{
@@ -84,14 +81,8 @@ public class HockeyPlayer {
 	
 	public void resetPosition()
 	{
-		this.stick.setTransform(startPos.location, startPos.angle);
-		this.body.setTransform(startPos.location, 0f);
-		
 		this.body.setLinearVelocity(0f,0f);
 		this.body.setAngularVelocity(0f);
-		
-		this.stick.setLinearVelocity(0f,0f);
-		this.stick.setAngularVelocity(0f);
 	}
 
 	private void createBody()
@@ -114,51 +105,7 @@ public class HockeyPlayer {
 	    fixtureDef.restitution = 0.5f;
 	    fixtureDef.shape = dynamicCircle;
 	     
-	    this.body.createFixture(fixtureDef);
-	    
-	    createHockeyStick();
-		
-	}
-	
-	private void createHockeyStick()
-	{
-		Vector2 position= this.body.getWorldCenter();
-		
-		BodyDef bodyDef = new BodyDef();  
-	    bodyDef.type = BodyType.DynamicBody;  
-	    bodyDef.position.set(position.x - 6f, position.y);
-	    //bodyDef.fixedRotation = true;
-	    
-	    this.stick = world.createBody(bodyDef); 
-	    
-	    FixtureDef fixtureDef = new FixtureDef();
-		PolygonShape boxShape = new PolygonShape();
-		boxShape.setAsBox(4f, 0.5f);
-		fixtureDef.shape=boxShape;
-		fixtureDef.restitution=0.3f;
-		fixtureDef.density = 1f;
-	    fixtureDef.friction = 0.3f;  
-	    
-		stick.createFixture(fixtureDef);
-		
-		boxShape.dispose();
-		
-		RevoluteJointDef revoJoint = new RevoluteJointDef();
-		revoJoint.initialize(this.body, this.stick, position);
-//		revoJoint.bodyA = this.stick;
-//		revoJoint.bodyB = this.body;
-		revoJoint.collideConnected = false;
-//		revoJoint.localAnchorB.set(position);
-//		revoJoint.localAnchorA.set(stick.getWorldCenter());
-		
-		revoJoint.motorSpeed = 0;
-		revoJoint.maxMotorTorque = 10000f;
-		revoJoint.enableLimit = false;
-		revoJoint.enableMotor = true;
-		
-		world.createJoint(revoJoint);
-		
-		
+	    this.body.createFixture(fixtureDef);		
 	}
 	
 	public void updateIdentiferSprite(SpriteBatch spriteBatch)
@@ -166,16 +113,16 @@ public class HockeyPlayer {
 		//this needs to be done sperate as we want other sprites to take priority over it.
 		if(this.identifierSprite != null)
 		{
-			setSpritePosition(identifierSprite, PIXELS_PER_METER, body, body);
+			setSpritePosition(identifierSprite, PIXELS_PER_METER, body);
 			identifierSprite.draw(spriteBatch);
 		}
 	}
 	
 	public void updateSprite(SpriteBatch spriteBatch)
 	{
-		setSpritePosition(stickSprite, PIXELS_PER_METER, stick, stick);
-		stickSprite.draw(spriteBatch);
-		setSpritePosition(sprite, PIXELS_PER_METER, body, stick);
+		//setSpritePosition(stickSprite, PIXELS_PER_METER, stick, stick);
+		//stickSprite.draw(spriteBatch);
+		setSpritePosition(sprite, PIXELS_PER_METER, body);
 		sprite.draw(spriteBatch);
 	}
 	
@@ -185,9 +132,7 @@ public class HockeyPlayer {
 		
 		//Body A is not used at all, it just needs a body (any body).
 		def.bodyA = this.body;
-		def.bodyB = this.stick;
 		//def.collideConnected = true;
-		def.maxForce = 1000.0f * stick.getMass();
 		
 		def.target.set(jointStartPoint.x, jointStartPoint.y);
 		
@@ -219,12 +164,12 @@ public class HockeyPlayer {
 		updateStick(delta, rotation, position);
 	}
 	
-	public void setSpritePosition(Sprite spr, int PIXELS_PER_METER, Body forLocation, Body forAngle)
+	public void setSpritePosition(Sprite spr, int PIXELS_PER_METER, Body forLocation)
 	{
 		
 		spr.setPosition(PIXELS_PER_METER * forLocation.getPosition().x - spr.getWidth()/2,
 				PIXELS_PER_METER * forLocation.getPosition().y  - spr.getHeight()/2);
-		spr.setRotation((MathUtils.radiansToDegrees * forAngle.getAngle()));
+		//spr.setRotation((MathUtils.radiansToDegrees * forAngle.getAngle()));
 	}
 	
 	private Vector3 tempVec = new Vector3(0.0f,0.0f,0.0f);
@@ -263,7 +208,6 @@ public class HockeyPlayer {
 			moveForce.y = rotation.y * movementSquareMax;
 			
 		}
-		stickCenter = this.stick.getWorldCenter();
 			
 		//stickPositionRelativeToPlayer
 		Vector2 stickRelativePlayer = new Vector2(stickCenter.x - playerPosition.x, stickCenter.y - playerPosition.y);
@@ -271,32 +215,6 @@ public class HockeyPlayer {
 		float angleMovement = moveForce.angle();
 		
 		Gdx.app.debug("HockeyPlayer - Angle Stuff", "rotation: angleStick=" + String.valueOf(angleStick) + " angleMovement=" + String.valueOf(angleMovement));	
-		
-		float direction = 1.0f;
-		
-		if(angleStick + 6f >= angleMovement &&  angleStick - 6f <= angleMovement)
-		{
-			//nothing to do
-			Vector2 currentForce = this.stick.getLinearVelocity();
-			this.stick.applyForce(this.stick.getWorldVector(new Vector2(currentForce.x * (-1), currentForce.y * (-1))), stickCenter, true );
-			
-			return;
-		}
-		else if(angleStick > angleMovement)
-		{
-			if(angleMovement + 180f < angleStick)
-				direction = -1.0f;
-		}
-		else
-		{
-			if(angleMovement - 180f < angleStick)
-				direction = -1.0f;
-		}
-		
-		Vector2 forceVector= new Vector2(0.0f, this.stickPower*direction);
-		this.stick.applyForce(this.stick.getWorldVector(new Vector2(forceVector.x, forceVector.y)), stickCenter, true );
-		
-
 	}
 	
 	public static Sprite getStickSprite()
@@ -311,9 +229,11 @@ public class HockeyPlayer {
 		Texture playerTexture;
 		
 		if(side == Side.Home)
-			playerTexture = new Texture(Gdx.files.internal("Images/Objects/player_1_noarm.png"));
+			
+			//TODO
+			playerTexture = new Texture(Gdx.files.internal("playerBlueShirt1.png"));
 		else
-			playerTexture = new Texture(Gdx.files.internal("Images/Objects/player_2_noarm.png"));
+			playerTexture = new Texture(Gdx.files.internal("playerBlueShirt1.png"));
     	
     	return new Sprite(playerTexture);
 	}

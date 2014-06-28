@@ -2,7 +2,7 @@ package com.ladinc.gaga.core.ai;
 
 import com.badlogic.gdx.math.Vector2;
 import com.ladinc.gaga.core.controls.IControls;
-import com.ladinc.gaga.core.objects.HockeyPlayer;
+import com.ladinc.gaga.core.objects.Player;
 import com.ladinc.gaga.core.utilities.GenericEnums.Identifier;
 
 public class SimpleAi implements IControls{
@@ -13,7 +13,7 @@ public class SimpleAi implements IControls{
 	
 	private boolean divePressed;
 	
-	public HockeyPlayer player;
+	public Player player;
 
 	@Override
 	public Vector2 getMovementInput() {

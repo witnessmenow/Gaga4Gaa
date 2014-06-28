@@ -21,7 +21,7 @@ public class Puck
 	
 	public Body body;
 	
-	public HockeyPlayer lastPlayerToTouch;
+	public Player lastPlayerToTouch;
 	
 	public float puckSize = 1f;
 	float slowDownMultiplier = 0.2f;

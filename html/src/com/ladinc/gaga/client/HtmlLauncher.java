@@ -3,7 +3,7 @@ package com.ladinc.gaga.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.ladinc.gaga.MyGdxGame;
+import com.ladinc.gaga.core.Gaga;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -14,6 +14,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener getApplicationListener () {
-                return new MyGdxGame();
+                return new Gaga();
         }
 }

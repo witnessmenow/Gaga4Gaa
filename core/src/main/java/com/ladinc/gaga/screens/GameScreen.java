@@ -54,16 +54,28 @@ public class GameScreen implements Screen {
 
 		spriteBatch = new SpriteBatch();
 
-		setUpPositionsMap();
+		setUpStartPositionsMap();
 		
 		this.debugRenderer = new Box2DDebugRenderer();
 	}
 
-	private void setUpPositionsMap() {
-		this.positionVector.put(1, new Vector2(this.screenWidth/2, 10));
-		this.positionVector.put(2, new Vector2(20, 40));
-		this.positionVector.put(3, new Vector2(this.screenWidth/2, 40));
-		this.positionVector.put(4, new Vector2(this.screenWidth-20, 40));
+	private void setUpStartPositionsMap() {
+		
+		//keeper
+		this.positionVector.put(1, new Vector2(this.screenWidth/2/PIXELS_PER_METER, 10));
+		
+		//backs
+		this.positionVector.put(2, new Vector2(this.screenWidth/(PIXELS_PER_METER*4), 40));
+		this.positionVector.put(3, new Vector2((this.screenWidth*2)/(PIXELS_PER_METER*4), 40));
+		this.positionVector.put(4, new Vector2((this.screenWidth*3)/(PIXELS_PER_METER*4), 40));
+		
+		//midfielders
+		this.positionVector.put(5, new Vector2((this.screenWidth)/(PIXELS_PER_METER*5), 70));
+		this.positionVector.put(6, new Vector2((this.screenWidth*2)/(PIXELS_PER_METER*5), 70));
+		this.positionVector.put(7, new Vector2((this.screenWidth*3)/(PIXELS_PER_METER*5), 70));
+		this.positionVector.put(8, new Vector2((this.screenWidth*4)/(PIXELS_PER_METER*5), 70));
+		this.positionVector.put(9, new Vector2((this.screenWidth*5)/(PIXELS_PER_METER*5), 70));
+		
 	}
 
 	@Override
@@ -100,9 +112,9 @@ public class GameScreen implements Screen {
 		
 		//create a full team of players here. use starting positions using
 		//map and player number as the index
-		new Player(world, this.positionVector.get(1), camera);
-		new Player(world, this.positionVector.get(2), camera);
-		new Player(world, this.positionVector.get(3), camera);
+		for(int i = 1; i < this.positionVector.size();i++){
+			new Player(world, this.positionVector.get(i), camera);
+		}
 	}
 
 	@Override

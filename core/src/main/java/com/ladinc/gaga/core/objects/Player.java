@@ -38,16 +38,19 @@ public class Player {
 		this.world = world;
 		this.camera = camera;
 
-		createBody();
+		createBody(startPos);
 
 		this.sprite = Player.getPlayerSprite();
 	}
 	
-	private void createBody() {
+	private void createBody(Vector2 startPos) {
 		// Dynamic Body
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.StaticBody;
 
+		bodyDef.position
+		.set(startPos.x, startPos.y);
+		
 		// This keeps it that the force up is applied relative to the screen,
 		// rather than the direction that the player is facing
 		bodyDef.fixedRotation = true;

@@ -18,10 +18,11 @@ public class Gaga extends Game
 	public void create() 
 	{
 		Gdx.app.setLogLevel(Application.LOG_ERROR);		
+		createScreens();
+		setScreen(gameScreen);
 	}
 	
 	private void createScreens() {
 		this.gameScreen = new GameScreen(this);
-
 	}
 }

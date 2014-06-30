@@ -1,5 +1,8 @@
 package com.ladinc.gaga.screens;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -33,6 +36,8 @@ public class GameScreen implements Screen {
 	private SpriteBatch spriteBatch;
 	private World world;
 
+	Map<Integer, Vector2> positionVector = new HashMap<Integer, Vector2>();
+	
 	public GameScreen(Gaga game) {
 		this.game = game;
 
@@ -49,7 +54,16 @@ public class GameScreen implements Screen {
 
 		spriteBatch = new SpriteBatch();
 
+		setUpPositionsMap();
+		
 		this.debugRenderer = new Box2DDebugRenderer();
+	}
+
+	private void setUpPositionsMap() {
+		this.positionVector.put(1, new Vector2(this.screenWidth/2, 10));
+		this.positionVector.put(2, new Vector2(20, 40));
+		this.positionVector.put(3, new Vector2(this.screenWidth/2, 40));
+		this.positionVector.put(4, new Vector2(this.screenWidth-20, 40));
 	}
 
 	@Override
@@ -69,8 +83,8 @@ public class GameScreen implements Screen {
 		// world.step(1/60f, 3, 3);
 		world.clearForces();
 
-		 this.spriteBatch.begin();
-		 this.spriteBatch.end();
+		this.spriteBatch.begin();
+		this.spriteBatch.end();
 
 		debugRenderer.render(world, camera.combined.scale(PIXELS_PER_METER,
 				PIXELS_PER_METER, PIXELS_PER_METER));
@@ -86,7 +100,9 @@ public class GameScreen implements Screen {
 		
 		//create a full team of players here. use starting positions using
 		//map and player number as the index
-		new Player(world, center, camera);
+		new Player(world, this.positionVector.get(1), camera);
+		new Player(world, this.positionVector.get(2), camera);
+		new Player(world, this.positionVector.get(3), camera);
 	}
 
 	@Override

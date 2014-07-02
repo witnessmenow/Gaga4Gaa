@@ -86,7 +86,7 @@ public class GameScreen implements Screen {
 
 		Gaga.delta  = delta;
 
-		camera.zoom = 1.1f;
+		camera.zoom = 5f;
 		camera.update();
 		// TODO: spriteBatch.setProjectionMatrix(camera.combined);
 
@@ -119,18 +119,18 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void show() {
-		//add walls, length of the pitch is 1.5 times screen height
 		world = new World(new Vector2(0.0f, 0.0f), true);
 		addWalls();
 		createPlayers();
 	}
 
+	//add walls, length of the pitch is 1.5 times screen height
 	private void addWalls() {
-		new BoxProp(world, screenWidth, 1, new Vector2(3,
+		new BoxProp(world, screenWidth/10, 1, new Vector2(screenWidth/20,
 						GAP_BETWEEN_TOPBOTTOMWALL_AND_EDGE)); // bottom
-		new BoxProp(world, screenWidth, 1, new Vector2(screenWidth / 2, screenHeight*1.5f)); // top
-		new BoxProp(world, 1, screenHeight*1.5f, new Vector2(3, screenHeight / 2));// left
-		new BoxProp(world, 1, screenHeight*1.5f, new Vector2(190, screenHeight / 2)); // right
+		new BoxProp(world, screenWidth/10, 1, new Vector2(screenWidth/20, screenHeight/6)); // top
+		new BoxProp(world, 1, screenHeight/6, new Vector2(3, screenHeight / 12));// left
+		new BoxProp(world, 1, screenHeight/6, new Vector2(190, screenHeight /12)); // right
 	}
 
 	@Override

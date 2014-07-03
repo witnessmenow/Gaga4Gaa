@@ -117,4 +117,18 @@ public class Ball {
 	{
 		//Art.updateSprite(this.sprite, spriteBatch, PIXELS_PER_METER, this.body);
 	}
+	
+	public Vector2 getPosition(){
+		return this.body.getPosition();
+	}
+	
+	//Get distance of a player from the ball, can use this to determine if the player has control of the ball
+	public double getDistanceFromPlayer(Body playerBody){
+		double xDist = ((playerBody.getPosition().x - this.body.getPosition().x)*(playerBody.getPosition().x - this.body.getPosition().x));
+		double yDist = ((playerBody.getPosition().y - this.body.getPosition().y)*(playerBody.getPosition().y - this.body.getPosition().y));
+		
+		double dist = Math.sqrt(xDist - yDist);
+		
+		return dist;
+	}
 }

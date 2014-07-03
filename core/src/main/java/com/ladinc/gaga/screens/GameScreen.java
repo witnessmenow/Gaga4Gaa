@@ -2,6 +2,7 @@ package com.ladinc.gaga.screens;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -42,10 +43,14 @@ public class GameScreen implements Screen {
 	private SpriteBatch spriteBatch;
 	private World world;
 
-	public static Map<String, Texture> textureMap = new HashMap<String, Texture>();
+	public static Map<String, Sprite> textureMap = new HashMap<String, Sprite>();
 	
 	Map<Integer, Vector2> positionVector = new HashMap<Integer, Vector2>();
 	private Texture ballTexture;
+	private Ball ball;
+	private Map<Integer, Player> playerMap = new HashMap<Integer, Player>();
+	
+	public static boolean attacking = false;
 	
 	public GameScreen(Gaga game) {
 		this.game = game;
@@ -73,15 +78,16 @@ public class GameScreen implements Screen {
     {
         if(sprite != null && spriteBatch != null && body != null)
         {
-                setSpritePosition(sprite, PIXELS_PER_METER, body);
-
-                sprite.draw(spriteBatch);
+            setSpritePosition(sprite, PIXELS_PER_METER, body);
+            sprite.draw(spriteBatch);
         }
     }
 	
+	
+	
 	private void setUpTextureMap() {
 		ballTexture = new Texture(Gdx.files.internal("ball.png"));
-		textureMap.put(BALL, ballTexture);
+		textureMap.put(BALL, new Sprite(ballTexture));
 	}
 
 	public static void setSpritePosition(Sprite sprite, int PIXELS_PER_METER, Body body)
@@ -135,12 +141,28 @@ public class GameScreen implements Screen {
 
 		this.spriteBatch.begin();
 		
-		//updateSprite(birdSprite, spriteBatch, PIXELS_PER_METER, bird.body);
-		
+		updateSprite(textureMap.get(BALL), this.spriteBatch, PIXELS_PER_METER, ball.body);
+		updatePlayerPositions();
 		this.spriteBatch.end();
 
 		debugRenderer.render(world, camera.combined.scale(PIXELS_PER_METER,
 				PIXELS_PER_METER, PIXELS_PER_METER));
+	}
+
+	private void updatePlayerPositions() {
+		//if attacking, players should run to attacking target positions, one per player
+		//if defending, closest player should run to ball, the rest should return to target position for defending
+	
+		for(Entry<Integer, Player> entry : playerMap.entrySet()){
+			Player player = entry.getValue();
+			
+			if(attacking){
+				
+			}
+			else{
+				
+			}
+		}
 	}
 
 	@Override
@@ -154,7 +176,8 @@ public class GameScreen implements Screen {
 		//create a full team of players here. use starting positions using
 		//map and player number as the index
 		for(int i = 1; i <= this.positionVector.size(); i++){
-			new Player(world, this.positionVector.get(i), camera);
+			Player player = new Player(world, this.positionVector.get(i), camera);
+			playerMap.put(i, player);
 		}
 	}
 
@@ -167,7 +190,7 @@ public class GameScreen implements Screen {
 	}
 
 	private void addBall() {
-		new Ball(world, 30, 30, new Sprite(textureMap.get(BALL)));
+		this.ball = new Ball(world, 30, 30, new Sprite(textureMap.get(BALL)));
 	}
 
 	//add walls, length of the pitch is 1.5 times screen height

@@ -1,23 +1,16 @@
 package com.ladinc.gaga.core.objects;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
-import com.badlogic.gdx.physics.box2d.joints.MouseJointDef;
-import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 
 public class Player {
 
@@ -31,6 +24,48 @@ public class Player {
 	private World world;
 
 	private OrthographicCamera camera;
+
+	public static float PLAYER_SPEED = 10;
+	
+	private Vector2 leftMovement = new Vector2(0, 0);
+	private boolean isClosestPlayerToBall = false;
+	
+	public double distFromBall;
+	
+	public double getDistFromBall() {
+		return distFromBall;
+	}
+
+	public void setDistFromBall(double d) {
+		this.distFromBall = d;
+	}
+
+	public Vector2 targetAttackingPosition;
+	public Vector2 getTargetAttackingPosition() {
+		return targetAttackingPosition;
+	}
+
+	public void setTargetAttackingPosition(Vector2 targetAttackingPosition) {
+		this.targetAttackingPosition = targetAttackingPosition;
+	}
+
+	public Vector2 getTargetDefendingPosition() {
+		return targetDefendingPosition;
+	}
+
+	public void setTargetDefendingPosition(Vector2 targetDefendingPosition) {
+		this.targetDefendingPosition = targetDefendingPosition;
+	}
+
+	public Vector2 targetDefendingPosition;
+	
+	public boolean getIsClosestPlayerToBall() {
+		return isClosestPlayerToBall;
+	}
+
+	public void setIsClosestPlayerToBall(boolean closestPlayerToBall) {
+		this.isClosestPlayerToBall = closestPlayerToBall;
+	}
 
 	public Player(World world, Vector2 startPos,
 			OrthographicCamera camera) {
@@ -87,5 +122,44 @@ public class Player {
 	public static Sprite getPlayerSprite() {
 		Texture playerTexture;
 		return null;
+	}
+	
+	//When attacking, this method will get the movement of the player towards some target position on the pithc
+	//When defending, this will either get the moveemnt of the player to the ball if that player is the closest, 
+	//or it will get the movement towards the players target defending position
+	public Vector2 getMovementoPlayerTowardsTargetDest(Vector2 aiLocation, Vector2 playerLocation) {
+
+		Vector2 temp = new Vector2(playerLocation.x - aiLocation.x, (playerLocation.y - aiLocation.y));
+
+		int direcitonX = 1;
+		int directionY = 1;
+
+		if(temp.x < 1)
+		{
+			direcitonX = -1;
+		}
+
+		if(temp.y < 1)
+		{
+			directionY = -1;
+		}
+
+		float absX = Math.abs(temp.x);
+		float absY = Math.abs(temp.y);
+
+		if(absX > absY)
+		{
+			temp.x = direcitonX * 1;
+			temp.y = directionY * (absY/absX);
+		}
+		else
+		{
+
+			temp.y = directionY * 1;
+			temp.x = direcitonX * (absX/absY);				
+
+		}
+		return leftMovement =  temp;
+
 	}
 }

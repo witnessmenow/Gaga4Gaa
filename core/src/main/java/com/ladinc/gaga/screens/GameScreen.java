@@ -1,5 +1,6 @@
 package com.ladinc.gaga.screens;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -138,7 +139,7 @@ public class GameScreen implements Screen {
 		// world.clearForces();
 		// world.step(1/60f, 3, 3);
 		world.clearForces();
-
+				
 		this.spriteBatch.begin();
 		
 		updateSprite(textureMap.get(BALL), this.spriteBatch, PIXELS_PER_METER, ball.body);
@@ -151,18 +152,52 @@ public class GameScreen implements Screen {
 
 	private void updatePlayerPositions() {
 		//if attacking, players should run to attacking target positions, one per player
-		//if defending, closest player should run to ball, the rest should return to target position for defending
+		//if defending, closest player should run to ball, the rest should return to target position for defending,,
+		//which is their starting positions
 	
 		for(Entry<Integer, Player> entry : playerMap.entrySet()){
 			Player player = entry.getValue();
+			Vector2 linearVel;
 			
 			if(attacking){
-				
+				linearVel = player.getMovementoPlayerTowardsTargetDest(player.body.getPosition(), player.getTargetAttackingPosition());
+				player.body.setLinearVelocity(new Vector2(Player.PLAYER_SPEED * linearVel.x, Player.PLAYER_SPEED * linearVel.y));
 			}
 			else{
+				//get closest player to ball
+				setClosestPlayerToBall(new ArrayList<Player>(playerMap.values()));
 				
+				//pass in either the ball of the player target defending position, based on the 'isClosestToBall' boolean 
+				linearVel = player.getMovementoPlayerTowardsTargetDest(player.body.getPosition(), player.getIsClosestPlayerToBall()?ball.getPosition():player.getTargetDefendingPosition());
+				
+				player.body.setLinearVelocity(Player.PLAYER_SPEED * linearVel.x, Player.PLAYER_SPEED * linearVel.y);
 			}
 		}
+	}
+
+	//go through list of players on the field. Set the player that is closest to the ball
+	//as he will be the only one drawn towards the ball when defending
+	private void setClosestPlayerToBall(ArrayList<Player> playerList) {
+		double minDist = 100000000; //some really high number so that at least one player will definitely be less than it
+		
+		for(Player player : playerList){
+			double distanceFromPlayer = ball.getDistanceFromPlayer(player.body);
+			if(distanceFromPlayer<minDist){
+				minDist = distanceFromPlayer;
+				
+				//reset all 'IsClosestPlayerToBall' player values to false as there is a 'new' closest player value
+				resetClosePlayerBools(playerList);
+				
+				player.setIsClosestPlayerToBall(true);
+			}	
+		}
+	}
+
+	private void resetClosePlayerBools(ArrayList<Player> playerList) {
+		for(Player player : playerList){
+			player.setIsClosestPlayerToBall(false);
+		}
+		
 	}
 
 	@Override

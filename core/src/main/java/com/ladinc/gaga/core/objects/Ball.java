@@ -123,11 +123,12 @@ public class Ball {
 	}
 	
 	//Get distance of a player from the ball, can use this to determine if the player has control of the ball
+	//Use the formula 'root((x1-x2)2 + (y1-y2)2)' //TODO Confirm this!!
 	public double getDistanceFromPlayer(Body playerBody){
 		double xDist = ((playerBody.getPosition().x - this.body.getPosition().x)*(playerBody.getPosition().x - this.body.getPosition().x));
 		double yDist = ((playerBody.getPosition().y - this.body.getPosition().y)*(playerBody.getPosition().y - this.body.getPosition().y));
 		
-		double dist = Math.sqrt(xDist - yDist);
+		double dist = Math.sqrt(xDist + yDist);
 		
 		return dist;
 	}

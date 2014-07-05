@@ -25,7 +25,7 @@ public class Player {
 
 	private OrthographicCamera camera;
 
-	public static float PLAYER_SPEED = 10;
+	public static float PLAYER_SPEED = 1000;
 	
 	private Vector2 leftMovement = new Vector2(0, 0);
 	private boolean isClosestPlayerToBall = false;

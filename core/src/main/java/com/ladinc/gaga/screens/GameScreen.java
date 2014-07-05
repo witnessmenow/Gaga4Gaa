@@ -46,10 +46,15 @@ public class GameScreen implements Screen {
 
 	public static Map<String, Sprite> textureMap = new HashMap<String, Sprite>();
 	
-	Map<Integer, Vector2> positionVector = new HashMap<Integer, Vector2>();
+	Map<Integer, Vector2> positionVectorMap = new HashMap<Integer, Vector2>();
+	
+	//these maps will use the same key as the positionVectorMap
+	public static Map<Integer, Vector2> defendingPositionsMap = new HashMap<Integer, Vector2>();
+	public static Map<Integer, Vector2> attackingPositionsMap = new HashMap<Integer, Vector2>();
+	
 	private Texture ballTexture;
 	private Ball ball;
-	private Map<Integer, Player> playerMap = new HashMap<Integer, Player>();
+	public static Map<Integer, Player> playerMap = new HashMap<Integer, Player>();
 	
 	public static boolean attacking = false;
 	
@@ -69,10 +74,72 @@ public class GameScreen implements Screen {
 
 		spriteBatch = new SpriteBatch();
 
-		setUpStartPositionsMap();
+//		setUpStartPositionsMap();
+//		
+//		setUpAttackingPositionsMap();
+//		setUpDefendingPositionsMap();
+//
+//		applyAttakcingAndDefendingPositionsToPlayers();
+		
 		setUpTextureMap();
 		
 		this.debugRenderer = new Box2DDebugRenderer();
+	}
+
+	private void applyAttackingAndDefendingPositionsToPlayers() {
+		for(int i = 1; i<=playerMap.size(); i++){
+			playerMap.get(i).setTargetDefendingPosition(defendingPositionsMap.get(i));
+			playerMap.get(i).setTargetAttackingPosition(attackingPositionsMap.get(i));
+		}
+	}
+
+	//These will be the positions that the players run to when they are attacking
+	//TODO Need to draw this out, dont want all players just moving forward consistently, try stagger their position
+	//also need to stagger speed of players based on position, i.e. positions 0-4 are all defenders, they should be slower etc.
+	
+	//TODO Need to vary the x-values a lot here, so that players make 'intelligent' runs and dont just all run forward in a straight line
+	private void setUpAttackingPositionsMap() {
+		//keeper
+		attackingPositionsMap.put(1, new Vector2(this.positionVectorMap.get(1).x , this.positionVectorMap.get(1).y + 20)); 
+		
+		//defender //TODO want to stagger their positions a little when defending, so the y-values will vary slightly
+		attackingPositionsMap.put(2, new Vector2(this.positionVectorMap.get(2).x, this.positionVectorMap.get(2).y + 25));
+		attackingPositionsMap.put(3, new Vector2(this.positionVectorMap.get(3).x, this.positionVectorMap.get(3).y + 0));
+		attackingPositionsMap.put(4, new Vector2(this.positionVectorMap.get(4).x, this.positionVectorMap.get(4).y + 45));
+		
+		//mids
+		attackingPositionsMap.put(5, new Vector2(this.positionVectorMap.get(5).x, this.positionVectorMap.get(5).y + 45));
+		attackingPositionsMap.put(6, new Vector2(this.positionVectorMap.get(6).x, this.positionVectorMap.get(6).y + 75));
+		attackingPositionsMap.put(7, new Vector2(this.positionVectorMap.get(7).x, this.positionVectorMap.get(7).y + 65));
+		attackingPositionsMap.put(8, new Vector2(this.positionVectorMap.get(8).x, this.positionVectorMap.get(8).y + 80));
+		
+		//forwards
+		attackingPositionsMap.put(9, new Vector2(this.positionVectorMap.get(9).x, this.positionVectorMap.get(9).y + 75));
+		attackingPositionsMap.put(10, new Vector2(this.positionVectorMap.get(10).x, this.positionVectorMap.get(10).y + 65));
+		attackingPositionsMap.put(11, new Vector2(this.positionVectorMap.get(11).x, this.positionVectorMap.get(11).y + 80));		
+	}
+
+	//These will be the positions the players aim to get to when defending,
+	//except for the player thats closest to the ball - he will just run towards the ball
+	private void setUpDefendingPositionsMap() {
+		//keeper
+		defendingPositionsMap.put(1, new Vector2(this.positionVectorMap.get(1).x, this.positionVectorMap.get(1).y - 10)); 
+		
+		//defenders //TODO want to stagger their positions a little when defending, so the y-values will vary slightly
+		defendingPositionsMap.put(2, new Vector2(this.positionVectorMap.get(2).x, this.positionVectorMap.get(2).y - 5));
+		defendingPositionsMap.put(3, new Vector2(this.positionVectorMap.get(3).x, this.positionVectorMap.get(3).y - 0));
+		defendingPositionsMap.put(4, new Vector2(this.positionVectorMap.get(4).x, this.positionVectorMap.get(4).y - 15));
+		
+		//mids
+		defendingPositionsMap.put(5, new Vector2(this.positionVectorMap.get(5).x, this.positionVectorMap.get(5).y + 5));
+		defendingPositionsMap.put(6, new Vector2(this.positionVectorMap.get(6).x, this.positionVectorMap.get(6).y + 5));
+		defendingPositionsMap.put(7, new Vector2(this.positionVectorMap.get(7).x, this.positionVectorMap.get(7).y - 15));
+		defendingPositionsMap.put(8, new Vector2(this.positionVectorMap.get(8).x, this.positionVectorMap.get(8).y - 0));
+	
+		//forwards
+		defendingPositionsMap.put(9, new Vector2(this.positionVectorMap.get(9).x, this.positionVectorMap.get(9).y + 5));
+		defendingPositionsMap.put(10, new Vector2(this.positionVectorMap.get(10).x, this.positionVectorMap.get(10).y - 15));
+		defendingPositionsMap.put(11, new Vector2(this.positionVectorMap.get(11).x, this.positionVectorMap.get(11).y - 0));	
 	}
 
 	public static void updateSprite(Sprite sprite, SpriteBatch spriteBatch, int PIXELS_PER_METER, Body body)
@@ -83,9 +150,7 @@ public class GameScreen implements Screen {
             sprite.draw(spriteBatch);
         }
     }
-	
-	
-	
+		
 	private void setUpTextureMap() {
 		ballTexture = new Texture(Gdx.files.internal("ball.png"));
 		textureMap.put(BALL, new Sprite(ballTexture));
@@ -104,23 +169,23 @@ public class GameScreen implements Screen {
 	private void setUpStartPositionsMap() {
 		
 		//keeper
-		this.positionVector.put(1, new Vector2(this.screenWidth/2/PIXELS_PER_METER, 10));
+		this.positionVectorMap.put(1, new Vector2(this.screenWidth/2/PIXELS_PER_METER, 10));
 		
 		//backs
-		this.positionVector.put(2, new Vector2(this.screenWidth/(PIXELS_PER_METER*4), 30));
-		this.positionVector.put(3, new Vector2((this.screenWidth*2)/(PIXELS_PER_METER*4), 30));
-		this.positionVector.put(4, new Vector2((this.screenWidth*3)/(PIXELS_PER_METER*4), 30));
+		this.positionVectorMap.put(2, new Vector2(this.screenWidth/(PIXELS_PER_METER*4), 30));
+		this.positionVectorMap.put(3, new Vector2((this.screenWidth*2)/(PIXELS_PER_METER*4), 30));
+		this.positionVectorMap.put(4, new Vector2((this.screenWidth*3)/(PIXELS_PER_METER*4), 30));
 		
 		//midfielders
-		this.positionVector.put(5, new Vector2((this.screenWidth)/(PIXELS_PER_METER*5), 50));
-		this.positionVector.put(6, new Vector2((this.screenWidth*2)/(PIXELS_PER_METER*5), 50));
-		this.positionVector.put(7, new Vector2((this.screenWidth*3)/(PIXELS_PER_METER*5), 50));
-		this.positionVector.put(8, new Vector2((this.screenWidth*4)/(PIXELS_PER_METER*5), 50));
+		this.positionVectorMap.put(5, new Vector2((this.screenWidth)/(PIXELS_PER_METER*5), 50));
+		this.positionVectorMap.put(6, new Vector2((this.screenWidth*2)/(PIXELS_PER_METER*5), 50));
+		this.positionVectorMap.put(7, new Vector2((this.screenWidth*3)/(PIXELS_PER_METER*5), 50));
+		this.positionVectorMap.put(8, new Vector2((this.screenWidth*4)/(PIXELS_PER_METER*5), 50));
 		
 		//forwards
-		this.positionVector.put(9, new Vector2((this.screenWidth)/(PIXELS_PER_METER*4), 70));
-		this.positionVector.put(10, new Vector2((this.screenWidth*2)/(PIXELS_PER_METER*4), 70));
-		this.positionVector.put(11, new Vector2((this.screenWidth*3)/(PIXELS_PER_METER*4), 70));
+		this.positionVectorMap.put(9, new Vector2((this.screenWidth)/(PIXELS_PER_METER*4), 70));
+		this.positionVectorMap.put(10, new Vector2((this.screenWidth*2)/(PIXELS_PER_METER*4), 70));
+		this.positionVectorMap.put(11, new Vector2((this.screenWidth*3)/(PIXELS_PER_METER*4), 70));
 	}
 
 	@Override
@@ -210,8 +275,8 @@ public class GameScreen implements Screen {
 		
 		//create a full team of players here. use starting positions using
 		//map and player number as the index
-		for(int i = 1; i <= this.positionVector.size(); i++){
-			Player player = new Player(world, this.positionVector.get(i), camera);
+		for(int i = 1; i <= this.positionVectorMap.size(); i++){
+			Player player = new Player(world, this.positionVectorMap.get(i), camera);
 			playerMap.put(i, player);
 		}
 	}
@@ -220,7 +285,14 @@ public class GameScreen implements Screen {
 	public void show() {
 		world = new World(new Vector2(0.0f, 0.0f), true);
 		addWalls();
+		setUpStartPositionsMap();
+		
+		setUpAttackingPositionsMap();
+		setUpDefendingPositionsMap();
+		
 		createPlayers();
+		applyAttackingAndDefendingPositionsToPlayers();
+		
 		addBall();
 	}
 

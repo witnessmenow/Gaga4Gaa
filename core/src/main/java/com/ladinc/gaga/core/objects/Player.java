@@ -14,6 +14,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public class Player {
 
+	public static final double PLAYER_HEIGHT = 10;
+
 	float playerSize = 3f;
 
 	private static int PIXELS_PER_METER = 10;
@@ -25,13 +27,23 @@ public class Player {
 
 	private OrthographicCamera camera;
 
-	public static float PLAYER_SPEED = 1000;
+	public static float PLAYER_SPEED = 10;
 	
 	private Vector2 leftMovement = new Vector2(0, 0);
 	private boolean isClosestPlayerToBall = false;
 	
 	public double distFromBall;
 	
+	private boolean hasBall = false;
+	
+	public boolean getHasBall() {
+		return hasBall;
+	}
+
+	public void setHasBall(boolean hasBall) {
+		this.hasBall = hasBall;
+	}
+
 	public double getDistFromBall() {
 		return distFromBall;
 	}
@@ -81,7 +93,7 @@ public class Player {
 	private void createBody(Vector2 startPos) {
 		// Dynamic Body
 		BodyDef bodyDef = new BodyDef();
-		bodyDef.type = BodyType.StaticBody;
+		bodyDef.type = BodyType.KinematicBody; //TODO Should this be dynamic so that it can 'hit' the ball
 
 		bodyDef.position
 		.set(startPos.x, startPos.y);

@@ -20,6 +20,16 @@ public class Ball {
 	public static final float ballOffsetX = 0f;
 	public Sprite sprite;
 
+	private double ballHeight = 0f;
+	
+	public double getBallHeight() {
+		return ballHeight;
+	}
+
+	public void setBallHeight(double ballHeight) {
+		this.ballHeight = ballHeight;
+	}
+
 	public Ball(World world, float x, float y, Sprite ballSprite, float ballSize) {
 		this.ballSize = ballSize;
 		createBallObject(world, x, y, ballSprite, false);

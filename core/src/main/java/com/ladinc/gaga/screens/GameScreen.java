@@ -73,13 +73,6 @@ public class GameScreen implements Screen {
 		this.camera.setToOrtho(false, this.screenWidth, this.screenHeight);
 
 		spriteBatch = new SpriteBatch();
-
-//		setUpStartPositionsMap();
-//		
-//		setUpAttackingPositionsMap();
-//		setUpDefendingPositionsMap();
-//
-//		applyAttakcingAndDefendingPositionsToPlayers();
 		
 		setUpTextureMap();
 		
@@ -123,12 +116,12 @@ public class GameScreen implements Screen {
 	//except for the player thats closest to the ball - he will just run towards the ball
 	private void setUpDefendingPositionsMap() {
 		//keeper
-		defendingPositionsMap.put(1, new Vector2(this.positionVectorMap.get(1).x, this.positionVectorMap.get(1).y - 10)); 
+		defendingPositionsMap.put(1, new Vector2(this.positionVectorMap.get(1).x, this.positionVectorMap.get(1).y)); 
 		
 		//defenders //TODO want to stagger their positions a little when defending, so the y-values will vary slightly
 		defendingPositionsMap.put(2, new Vector2(this.positionVectorMap.get(2).x, this.positionVectorMap.get(2).y - 5));
 		defendingPositionsMap.put(3, new Vector2(this.positionVectorMap.get(3).x, this.positionVectorMap.get(3).y - 0));
-		defendingPositionsMap.put(4, new Vector2(this.positionVectorMap.get(4).x, this.positionVectorMap.get(4).y - 15));
+		defendingPositionsMap.put(4, new Vector2(this.positionVectorMap.get(4).x, this.positionVectorMap.get(4).y - 5));
 		
 		//mids
 		defendingPositionsMap.put(5, new Vector2(this.positionVectorMap.get(5).x, this.positionVectorMap.get(5).y + 5));
@@ -159,8 +152,8 @@ public class GameScreen implements Screen {
 	public static void setSpritePosition(Sprite sprite, int PIXELS_PER_METER, Body body)
     {
         
-        sprite.setPosition(PIXELS_PER_METER * body.getPosition().x - sprite.getWidth()/2,
-                        PIXELS_PER_METER * body.getPosition().y  - sprite.getHeight()/2);
+        sprite.setPosition(PIXELS_PER_METER * body.getWorldCenter().x - sprite.getWidth()/2,
+                        PIXELS_PER_METER * body.getWorldCenter().y  - sprite.getHeight()/2);
         
         
         sprite.setRotation((MathUtils.radiansToDegrees * body.getAngle()));
@@ -207,13 +200,24 @@ public class GameScreen implements Screen {
 				
 		this.spriteBatch.begin();
 		
-		updateSprite(textureMap.get(BALL), this.spriteBatch, PIXELS_PER_METER, ball.body);
+		//updateSprite(textureMap.get(BALL), this.spriteBatch, PIXELS_PER_METER, ball.body);
 		updatePlayerPositions();
+		
 		this.spriteBatch.end();
 
 		debugRenderer.render(world, camera.combined.scale(PIXELS_PER_METER,
 				PIXELS_PER_METER, PIXELS_PER_METER));
 	}
+
+	//TODO Could use this method to draw an arrow on to the player to aim a pass/shot
+//	private void checkIfPlayerHasBall() {
+//		for(Entry<Integer, Player> playerSet : playerMap.entrySet()){
+//			if(playerSet.getValue().getHasBall()){
+//				
+//			}
+//		}
+//		
+//	}
 
 	private void updatePlayerPositions() {
 		//if attacking, players should run to attacking target positions, one per player
@@ -224,7 +228,8 @@ public class GameScreen implements Screen {
 			Player player = entry.getValue();
 			Vector2 linearVel;
 			
-			if(attacking){
+			//TODO: Should players move while they have the ball?
+			if(attacking && !player.getHasBall()){
 				linearVel = player.getMovementoPlayerTowardsTargetDest(player.body.getPosition(), player.getTargetAttackingPosition());
 				player.body.setLinearVelocity(new Vector2(Player.PLAYER_SPEED * linearVel.x, Player.PLAYER_SPEED * linearVel.y));
 			}
@@ -250,10 +255,18 @@ public class GameScreen implements Screen {
 			if(distanceFromPlayer<minDist){
 				minDist = distanceFromPlayer;
 				
+				if(minDist < 3 && ball.getBallHeight()<Player.PLAYER_HEIGHT){
+					player.setHasBall(true);
+					attacking = true;
+				}
+				else{
+					player.setHasBall(false);
+				}
 				//reset all 'IsClosestPlayerToBall' player values to false as there is a 'new' closest player value
 				resetClosePlayerBools(playerList);
 				
 				player.setIsClosestPlayerToBall(true);
+				
 			}	
 		}
 	}

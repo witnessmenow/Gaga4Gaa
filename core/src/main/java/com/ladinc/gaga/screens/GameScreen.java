@@ -287,7 +287,12 @@ public class GameScreen implements Screen {
 		if (position.x < 3 || position.x > 190) {
 			reverseBallDirection(true);
 		} else if (position.y > screenHeight / 6 || position.y < 3) {
-			reverseBallDirection(false);
+			if (position.x > this.center.x - 30
+					&& position.x < this.center.x + 30) {
+				goalScored();
+			} else {
+				reverseBallDirection(false);
+			}
 		}
 	}
 
@@ -301,6 +306,11 @@ public class GameScreen implements Screen {
 	// }
 	//
 	// }
+
+	private void goalScored() {
+		System.out.println("Goal Scored");
+
+	}
 
 	private void reverseBallDirection(boolean sideWall) {
 		if (sideWall) {
@@ -421,6 +431,7 @@ public class GameScreen implements Screen {
 	public void show() {
 		world = new World(new Vector2(0.0f, 0.0f), true);
 		addWalls();
+		addGoals();
 		setUpStartPositionsMap();
 
 		setUpAttackingPositionsMap();
@@ -430,6 +441,17 @@ public class GameScreen implements Screen {
 		applyAttackingAndDefendingPositionsToPlayers();
 
 		addBall();
+	}
+
+	// goals will just be simple rectangles, formed using 3 narrow boxes, and
+	// the fourth side is the end line
+	private void addGoals() {
+		// bottom goal
+		new BoxProp(world, 1, 10, new Vector2(this.center.x - 30, -1)); // left
+		new BoxProp(world, 1, 10, new Vector2(this.center.x + 30, -1)); // right
+		new BoxProp(world, 60, 1, new Vector2(this.center.x, -6)); // back
+
+		// TODO: top goal
 	}
 
 	private void addBall() {

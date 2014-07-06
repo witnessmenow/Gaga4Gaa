@@ -139,7 +139,7 @@ public class Player {
 	//When attacking, this method will get the movement of the player towards some target position on the pithc
 	//When defending, this will either get the moveemnt of the player to the ball if that player is the closest, 
 	//or it will get the movement towards the players target defending position
-	public Vector2 getMovementoPlayerTowardsTargetDest(Vector2 aiLocation, Vector2 playerLocation) {
+	public Vector2 getMovemenOfPlayerTowardsTargetDest(Vector2 aiLocation, Vector2 playerLocation) {
 
 		Vector2 temp = new Vector2(playerLocation.x - aiLocation.x, (playerLocation.y - aiLocation.y));
 

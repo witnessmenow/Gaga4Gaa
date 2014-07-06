@@ -1,6 +1,8 @@
 package com.ladinc.gaga.controls;
 
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Vector2;
+import com.ladinc.gaga.screens.GameScreen;
 
 public class SimpleDirectionGestureDetector extends GestureDetector {
 	public interface DirectionListener {
@@ -26,23 +28,27 @@ public class SimpleDirectionGestureDetector extends GestureDetector {
 		
 		@Override
         public boolean fling(float velocityX, float velocityY, int button) {
-			if(Math.abs(velocityX)>Math.abs(velocityY)){
+			if(GameScreen.ballAtFeet)
+			{
+				if(Math.abs(velocityX)>Math.abs(velocityY)){
 				if(velocityX>0){
 						directionListener.onRight();
 				}else{
 						directionListener.onLeft();
 				}
-			}else{
-				if(velocityY>0){
-						directionListener.onDown();
-				}else{                                  
-						directionListener.onUp();
+				}else{
+					if(velocityY>0){
+							directionListener.onDown();
+					}else{                                  
+							directionListener.onUp();
+					}
 				}
+				
+				GameScreen.moveBall(new Vector2(velocityX, -velocityY));
+				return super.fling(velocityX, velocityY, button);
 			}
+			return true;
 			
-			System.out.println("velocityX:"+velocityX);
-			System.out.println("velocityY:"+velocityY);
-			return super.fling(velocityX, velocityY, button);
         }
 
 	}

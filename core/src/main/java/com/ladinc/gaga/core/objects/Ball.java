@@ -21,7 +21,7 @@ public class Ball {
 	public Sprite sprite;
 
 	private double ballHeight = 0f;
-	
+
 	public double getBallHeight() {
 		return ballHeight;
 	}
@@ -35,8 +35,8 @@ public class Ball {
 		createBallObject(world, x, y, ballSprite, false);
 	}
 
-	public Ball(World world, float x, float y, Sprite ballSprite, float ballSize, float density, float linDamp) 
-	{
+	public Ball(World world, float x, float y, Sprite ballSprite,
+			float ballSize, float density, float linDamp) {
 		this.density = density;
 		this.ballSize = ballSize;
 		this.linDamp = linDamp;
@@ -54,12 +54,12 @@ public class Ball {
 	}
 
 	protected void createBallObject(World world, float x, float y,
-			Sprite ballSprite, boolean networked)
-	{
+			Sprite ballSprite, boolean networked) {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.position.set(x, y);
 		this.body = world.createBody(bodyDef);
+		this.body.setLinearDamping(0.3f);
 		CircleShape dynamicCircle = new CircleShape();
 		dynamicCircle.setRadius(ballSize);
 		FixtureDef fixtureDef = new FixtureDef();
@@ -67,23 +67,23 @@ public class Ball {
 		fixtureDef.density = density;
 		fixtureDef.friction = 0f;
 		fixtureDef.restitution = 1f;
-		
-		// we want the ball to be a sensor so it will be able to go over the 
-		//player's heads etc.
-		fixtureDef.isSensor = true; 
-		
+
+		// we want the ball to be a sensor so it will be able to go over the
+		// player's heads etc.
+		fixtureDef.isSensor = true;
+
 		this.body.createFixture(fixtureDef);
 		this.sprite = ballSprite;
 
-		//this.body.setUserData(new CollisionInfo("Ball", CollisionObjectType.Ball));
+		// this.body.setUserData(new CollisionInfo("Ball",
+		// CollisionObjectType.Ball));
 
 		dynamicCircle.dispose();
 
-		//this.body.setLinearDamping(BallSpeedPicker.getSlowDown());
+		// this.body.setLinearDamping(BallSpeedPicker.getSlowDown());
 	}
 
-	public Vector2 getLocalVelocity()
-	{
+	public Vector2 getLocalVelocity() {
 		/*
 		 * returns balls's velocity vector relative to the car
 		 */
@@ -91,55 +91,55 @@ public class Ball {
 				.getLinearVelocityFromLocalPoint(new Vector2(0, 0)));
 	}
 
-	public void update()
-	{
+	public void update() {
 
-		 Vector2 currentVelocity = this.getLocalVelocity(); Vector2 position = this.getLocation();
+		Vector2 currentVelocity = this.getLocalVelocity();
+		Vector2 position = this.getLocation();
 
-		 Gdx.app.debug("Ball Update",
-				 "Ball Position - " + position +
-						  "Ball Velocity - " + currentVelocity);
+		Gdx.app.debug("Ball Update", "Ball Position - " + position
+				+ "Ball Velocity - " + currentVelocity);
 
-
-		  //this.body.applyForce(this.body.getWorldVector(new Vector2( -(currentVelocity.x * (slowDownMultiplier)), -(currentVelocity.y * (slowDownMultiplier)))), position, true);
+		// this.body.applyForce(this.body.getWorldVector(new Vector2(
+		// -(currentVelocity.x * (slowDownMultiplier)), -(currentVelocity.y *
+		// (slowDownMultiplier)))), position, true);
 
 	}
 
-	public void resetPositionToStart(Vector2 startPoint)
-	{
+	public void resetPositionToStart(Vector2 startPoint) {
 		this.body.setTransform(startPoint, 0f);
-		this.body.setLinearVelocity(0f,0f);
+		this.body.setLinearVelocity(0f, 0f);
 		this.body.setAngularVelocity(0f);
 	}
 
-	public void networkUpdate(Vector2 velocity, Vector2 position)
-	{
+	public void networkUpdate(Vector2 velocity, Vector2 position) {
 		this.body.setTransform(position, 0);
 		// this.body.
 	}
 
-	public Vector2 getLocation()
-	{
+	public Vector2 getLocation() {
 		return this.body.getWorldCenter();
 	}
 
-	public void updateSprite(SpriteBatch spriteBatch, int PIXELS_PER_METER)
-	{
-		//Art.updateSprite(this.sprite, spriteBatch, PIXELS_PER_METER, this.body);
+	public void updateSprite(SpriteBatch spriteBatch, int PIXELS_PER_METER) {
+		// Art.updateSprite(this.sprite, spriteBatch, PIXELS_PER_METER,
+		// this.body);
 	}
-	
-	public Vector2 getPosition(){
+
+	public Vector2 getPosition() {
 		return this.body.getPosition();
 	}
-	
-	//Get distance of a player from the ball, can use this to determine if the player has control of the ball
-	//Use the formula 'root((x1-x2)2 + (y1-y2)2)' //TODO Confirm this!!
-	public double getDistanceFromPlayer(Body playerBody){
-		double xDist = ((playerBody.getPosition().x - this.body.getPosition().x)*(playerBody.getPosition().x - this.body.getPosition().x));
-		double yDist = ((playerBody.getPosition().y - this.body.getPosition().y)*(playerBody.getPosition().y - this.body.getPosition().y));
-		
+
+	// Get distance of a player from the ball, can use this to determine if the
+	// player has control of the ball
+	// Use the formula 'root((x1-x2)2 + (y1-y2)2)' //TODO Confirm this!!
+	public double getDistanceFromPlayer(Body playerBody) {
+		double xDist = ((playerBody.getPosition().x - this.body.getPosition().x) * (playerBody
+				.getPosition().x - this.body.getPosition().x));
+		double yDist = ((playerBody.getPosition().y - this.body.getPosition().y) * (playerBody
+				.getPosition().y - this.body.getPosition().y));
+
 		double dist = Math.sqrt(xDist + yDist);
-		
+
 		return dist;
 	}
 }

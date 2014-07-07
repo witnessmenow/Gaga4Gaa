@@ -469,7 +469,13 @@ public class GameScreen implements Screen {
 		new BoxProp(world, 1, 10, new Vector2(this.center.x + 30, -1)); // right
 		new BoxProp(world, 60, 1, new Vector2(this.center.x, -6)); // back
 
-		// TODO: top goal
+		// top goal
+		new BoxProp(world, 1, 10, new Vector2(this.center.x - 30,
+				this.screenHeight / 6 + 4)); // left
+		new BoxProp(world, 1, 10, new Vector2(this.center.x + 30,
+				this.screenHeight / 6 + 4)); // right
+		new BoxProp(world, 60, 1, new Vector2(this.center.x,
+				this.screenHeight / 6 + 10)); // back
 	}
 
 	private void addBall() {

@@ -262,6 +262,10 @@ public class GameScreen implements Screen {
 		// world.step(1/60f, 3, 3);
 		world.clearForces();
 
+		moveCamera(ball.body.getPosition().x * PIXELS_PER_METER,
+				ball.body.getPosition().y * PIXELS_PER_METER);
+		spriteBatch.setProjectionMatrix(camera.combined);
+
 		this.spriteBatch.begin();
 
 		// updateSprite(textureMap.get(BALL), this.spriteBatch,
@@ -273,6 +277,11 @@ public class GameScreen implements Screen {
 
 		debugRenderer.render(world, camera.combined.scale(PIXELS_PER_METER,
 				PIXELS_PER_METER, PIXELS_PER_METER));
+	}
+
+	public void moveCamera(float x, float y) {
+		camera.position.set(x, y, 0);
+		camera.update();
 	}
 
 	// Since the ball is a sensor, it will not 'hit' the walls, so we need ti

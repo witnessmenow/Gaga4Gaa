@@ -16,7 +16,7 @@ public class Ball {
 	public float ballSize = 2f;
 	protected float density = 0.25f;
 	protected float slowDownMultiplier = 0.75f;
-	protected float linDamp = 0.2f;
+	protected float linDamp = 1f;
 	public static final float ballOffsetX = 0f;
 	public Sprite sprite;
 

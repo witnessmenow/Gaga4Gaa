@@ -283,6 +283,12 @@ public class GameScreen implements Screen {
 	private void checkBallPosition() {
 		Vector2 position = ball.body.getWorldCenter();
 
+		for (Entry<Integer, Player> playerEntry : playerMap.entrySet()) {
+			if (playerEntry.getValue().getDistFromBall() < 1.5) {
+				ball.body.setLinearVelocity(new Vector2(0, 0));
+			}
+		}
+
 		// check if the ball is it the line of the walls
 		if (position.x < 3 || position.x > 190) {
 			reverseBallDirection(true);
@@ -381,9 +387,12 @@ public class GameScreen implements Screen {
 									// it
 
 		for (Player player : playerList) {
-			double distanceFromPlayer = ball.getDistanceFromPlayer(player.body);
-			if (distanceFromPlayer < minDist) {
-				minDist = distanceFromPlayer;
+			double distanceOfBallFromPlayer = ball
+					.getDistanceFromPlayer(player.body);
+			player.setDistFromBall(distanceOfBallFromPlayer);
+
+			if (distanceOfBallFromPlayer < minDist) {
+				minDist = distanceOfBallFromPlayer;
 
 				if (minDist < 3 && ball.getBallHeight() < Player.PLAYER_HEIGHT) {
 					player.setHasBall(true);

@@ -18,38 +18,38 @@ public class SimpleDirectionGestureDetector extends GestureDetector {
 	public SimpleDirectionGestureDetector(DirectionListener directionListener) {
 		super(new DirectionGestureListener(directionListener));
 	}
-	
-	private static class DirectionGestureListener extends GestureAdapter{
+
+	private static class DirectionGestureListener extends GestureAdapter {
 		DirectionListener directionListener;
-		
-		public DirectionGestureListener(DirectionListener directionListener){
+
+		public DirectionGestureListener(DirectionListener directionListener) {
 			this.directionListener = directionListener;
 		}
-		
+
 		@Override
-        public boolean fling(float velocityX, float velocityY, int button) {
-			if(GameScreen.ballAtFeet)
-			{
-				if(Math.abs(velocityX)>Math.abs(velocityY)){
-				if(velocityX>0){
+		public boolean fling(float velocityX, float velocityY, int button) {
+			if (GameScreen.ballAtFeet) {
+				if (Math.abs(velocityX) > Math.abs(velocityY)) {
+					if (velocityX > 0) {
 						directionListener.onRight();
-				}else{
+					} else {
 						directionListener.onLeft();
-				}
-				}else{
-					if(velocityY>0){
-							directionListener.onDown();
-					}else{                                  
-							directionListener.onUp();
+					}
+				} else {
+					if (velocityY > 0) {
+						directionListener.onDown();
+					} else {
+						directionListener.onUp();
 					}
 				}
-				
-				GameScreen.moveBall(new Vector2(velocityX, -velocityY));
+
+				GameScreen
+						.moveBall(new Vector2(velocityX * 10, -velocityY * 10));
 				return super.fling(velocityX, velocityY, button);
 			}
 			return true;
-			
-        }
+
+		}
 
 	}
 

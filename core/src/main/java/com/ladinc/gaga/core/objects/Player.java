@@ -11,6 +11,8 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.ladinc.gaga.core.collision.CollisionInfo;
+import com.ladinc.gaga.core.collision.CollisionInfo.CollisionObjectType;
 
 public class Player {
 
@@ -23,19 +25,38 @@ public class Player {
 	public Sprite sprite;
 
 	public Body body;
-	private World world;
+	private final World world;
 
-	private OrthographicCamera camera;
+	private final OrthographicCamera camera;
 
 	public static float PLAYER_SPEED = 10;
-	
-	private Vector2 leftMovement = new Vector2(0, 0);
+
+	private final Vector2 leftMovement = new Vector2(0, 0);
 	private boolean isClosestPlayerToBall = false;
-	
+
 	public double distFromBall;
-	
+
 	private boolean hasBall = false;
-	
+
+	private Vector2 attackingPos;
+	private Vector2 defendingPos;
+
+	public Vector2 getAttackingPos() {
+		return attackingPos;
+	}
+
+	public void setAttackingPos(Vector2 attackingPos) {
+		this.attackingPos = attackingPos;
+	}
+
+	public Vector2 getDefendingPos() {
+		return defendingPos;
+	}
+
+	public void setDefendingPos(Vector2 defendingPos) {
+		this.defendingPos = defendingPos;
+	}
+
 	public boolean getHasBall() {
 		return hasBall;
 	}
@@ -52,25 +73,6 @@ public class Player {
 		this.distFromBall = d;
 	}
 
-	public Vector2 targetAttackingPosition;
-	public Vector2 getTargetAttackingPosition() {
-		return targetAttackingPosition;
-	}
-
-	public void setTargetAttackingPosition(Vector2 targetAttackingPosition) {
-		this.targetAttackingPosition = targetAttackingPosition;
-	}
-
-	public Vector2 getTargetDefendingPosition() {
-		return targetDefendingPosition;
-	}
-
-	public void setTargetDefendingPosition(Vector2 targetDefendingPosition) {
-		this.targetDefendingPosition = targetDefendingPosition;
-	}
-
-	public Vector2 targetDefendingPosition;
-	
 	public boolean getIsClosestPlayerToBall() {
 		return isClosestPlayerToBall;
 	}
@@ -79,25 +81,28 @@ public class Player {
 		this.isClosestPlayerToBall = closestPlayerToBall;
 	}
 
-	public Player(World world, Vector2 startPos,
-			OrthographicCamera camera) {
+	public Player(World world, Vector2 startPos, Vector2 attackingPos,
+			Vector2 defendingPos, OrthographicCamera camera) {
 
 		this.world = world;
 		this.camera = camera;
+
+		this.attackingPos = attackingPos;
+		this.defendingPos = defendingPos;
 
 		createBody(startPos);
 
 		this.sprite = Player.getPlayerSprite();
 	}
-	
+
 	private void createBody(Vector2 startPos) {
 		// Dynamic Body
 		BodyDef bodyDef = new BodyDef();
-		bodyDef.type = BodyType.KinematicBody; //TODO Should this be dynamic so that it can 'hit' the ball
+		bodyDef.type = BodyType.DynamicBody; // TODO Should this be dynamic so
+												// that it can 'hit' the ball
 
-		bodyDef.position
-		.set(startPos.x, startPos.y);
-		
+		bodyDef.position.set(startPos.x, startPos.y);
+
 		// This keeps it that the force up is applied relative to the screen,
 		// rather than the direction that the player is facing
 		bodyDef.fixedRotation = true;
@@ -114,7 +119,11 @@ public class Player {
 
 		this.body.createFixture(fixtureDef);
 
-		//this.body.setUserData(new CollisionInfo("", CollisionObjectType.Player, this));
+		this.body.setUserData(new CollisionInfo("ball",
+				CollisionObjectType.Player, this));
+
+		// this.body.setUserData(new CollisionInfo("",
+		// CollisionObjectType.Player, this));
 	}
 
 	public void updateSprite(SpriteBatch spriteBatch) {
@@ -135,43 +144,61 @@ public class Player {
 		Texture playerTexture;
 		return null;
 	}
-	
-	//When attacking, this method will get the movement of the player towards some target position on the pithc
-	//When defending, this will either get the moveemnt of the player to the ball if that player is the closest, 
-	//or it will get the movement towards the players target defending position
-	public Vector2 getMovemenOfPlayerTowardsTargetDest(Vector2 aiLocation, Vector2 playerLocation) {
 
-		Vector2 temp = new Vector2(playerLocation.x - aiLocation.x, (playerLocation.y - aiLocation.y));
+	// When attacking, this method will get the movement of the player towards
+	// some target position on the pithc
+	// When defending, this will either get the moveemnt of the player to the
+	// ball if that player is the closest,
+	// or it will get the movement towards the players target defending position
+	public Vector2 getMovemenOfPlayerTowardsTargetDest(Vector2 aiLocation,
+			Vector2 playerLocation) {
 
-		int direcitonX = 1;
-		int directionY = 1;
+		Vector2 relativeVector = new Vector2();
 
-		if(temp.x < 1)
-		{
-			direcitonX = -1;
+		relativeVector.x = playerLocation.x - aiLocation.x;
+		relativeVector.y = playerLocation.y - aiLocation.y;
+
+		relativeVector.x = normalizeFloat(relativeVector.x, 1f);
+		relativeVector.y = normalizeFloat(relativeVector.y, 1f);
+
+		return relativeVector;
+		//
+		// Vector2 temp = new Vector2(playerLocation.x - aiLocation.x,
+		// (playerLocation.y - aiLocation.y));
+		//
+		// int direcitonX = 1;
+		// int directionY = 1;
+		//
+		// if (temp.x < 0) {
+		// direcitonX = -1;
+		// }
+		//
+		// if (temp.y < 1) {
+		// directionY = -1;
+		// }
+		//
+		// float absX = Math.abs(temp.x);
+		// float absY = Math.abs(temp.y);
+		//
+		// if (absX > absY) {
+		// temp.x = direcitonX * 1;
+		// temp.y = directionY * (absY / absX);
+		// } else {
+		//
+		// temp.y = directionY * 1;
+		// temp.x = direcitonX * (absX / absY);
+		//
+		// }
+		// return temp;
+
+	}
+
+	public float normalizeFloat(float value, float limit) {
+		if (value < 0) {
+			return Math.max(value, -limit);
+		} else {
+			return Math.min(value, limit);
 		}
-
-		if(temp.y < 1)
-		{
-			directionY = -1;
-		}
-
-		float absX = Math.abs(temp.x);
-		float absY = Math.abs(temp.y);
-
-		if(absX > absY)
-		{
-			temp.x = direcitonX * 1;
-			temp.y = directionY * (absY/absX);
-		}
-		else
-		{
-
-			temp.y = directionY * 1;
-			temp.x = direcitonX * (absX/absY);				
-
-		}
-		return leftMovement =  temp;
 
 	}
 }

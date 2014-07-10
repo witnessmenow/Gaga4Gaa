@@ -10,6 +10,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.ladinc.gaga.core.collision.CollisionInfo;
+import com.ladinc.gaga.core.collision.CollisionInfo.CollisionObjectType;
+import com.ladinc.gaga.core.objects.BoxProp.Line;
 
 public class Ball {
 	public Body body;
@@ -53,6 +56,21 @@ public class Ball {
 		createBallObject(world, x, y, ballSprite, networked);
 	}
 
+	public void playerHasBall(Player player) {
+		this.body.setLinearVelocity(new Vector2(0, 0));
+		// this.body.setTransform(player.body.getWorldCenter(), 0);
+	}
+
+	public void reverseBallDirection(Line wall) {
+		if (wall == Line.sideLine) {
+			this.body.setLinearVelocity(-this.body.getLinearVelocity().x,
+					this.body.getLinearVelocity().y);
+		} else {
+			this.body.setLinearVelocity(this.body.getLinearVelocity().x,
+					-this.body.getLinearVelocity().y);
+		}
+	}
+
 	protected void createBallObject(World world, float x, float y,
 			Sprite ballSprite, boolean networked) {
 		BodyDef bodyDef = new BodyDef();
@@ -74,6 +92,9 @@ public class Ball {
 
 		this.body.createFixture(fixtureDef);
 		this.sprite = ballSprite;
+
+		this.body.setUserData(new CollisionInfo("ball",
+				CollisionObjectType.Ball, this));
 
 		// this.body.setUserData(new CollisionInfo("Ball",
 		// CollisionObjectType.Ball));

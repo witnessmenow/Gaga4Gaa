@@ -61,16 +61,61 @@ public class GameContactListener implements ContactListener {
 					wall = (BoxProp) bodyAInfo.object;
 				}
 
-				ball.reverseBallDirection(wall.line);
-				Gdx.app.log("beginContact", "player got ball");
+				if (this.ballPassingGoalLine()) {
+					GameScreen.goalScored();
+				} else {
+					ball.reverseBallDirection(wall.line);
+				}
 			}
 		}
 
 	}
 
+	// TODO Need to use collision detection instead of co-ordinates to check if
+	// ball is passing goalline
+	private boolean ballPassingGoalLine() {
+		boolean goalScored = false;
+		if (passGoalLineX() && passGoalLineY()) {
+			goalScored = true;
+		}
+		return goalScored;
+	}
+
+	private boolean passGoalLineY() {
+		return GameScreen.ball.body.getWorldCenter().y < (GameScreen.screenHeight / 6 + 4)
+				&& GameScreen.ball.body.getWorldCenter().y > -1;
+	}
+
+	private boolean passGoalLineX() {
+		return GameScreen.ball.body.getWorldCenter().x > (GameScreen.center.x - 30)
+				&& GameScreen.ball.body.getWorldCenter().x < (GameScreen.center.x + 30);
+	}
+
 	@Override
 	public void endContact(Contact contact) {
-		// TODO Auto-generated method stub
+		Fixture fixtureA = contact.getFixtureA();
+		Fixture fixtureB = contact.getFixtureB();
+
+		CollisionInfo bodyAInfo = getCollisionInfoFromFixture(fixtureA);
+		CollisionInfo bodyBInfo = getCollisionInfoFromFixture(fixtureB);
+
+		Ball ball;
+		Player player;
+
+		if (bodyAInfo != null && bodyBInfo != null) {
+
+			Gdx.app.debug("endContact", "between " + bodyAInfo.type.toString()
+					+ " and " + bodyBInfo.type.toString());
+
+			if (GameContactListener.checkIfCollisionIsOfCertainBodies(
+					bodyAInfo, bodyBInfo, CollisionObjectType.Player,
+					CollisionObjectType.Ball)) {
+
+				GameScreen.ballAtFeet = false;
+
+				Gdx.app.log("endContact", "player kicked ball");
+			}
+		}
 
 	}
 

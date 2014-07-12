@@ -28,7 +28,7 @@ public class SimpleDirectionGestureDetector extends GestureDetector {
 
 		@Override
 		public boolean fling(float velocityX, float velocityY, int button) {
-			if (GameScreen.ballAtFeet) {
+			if (GameScreen.attacking) {
 				if (Math.abs(velocityX) > Math.abs(velocityY)) {
 					if (velocityX > 0) {
 						directionListener.onRight();

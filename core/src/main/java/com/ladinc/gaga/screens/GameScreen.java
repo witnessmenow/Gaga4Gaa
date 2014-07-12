@@ -30,17 +30,16 @@ public class GameScreen implements Screen {
 	private final Gaga game;
 	// Used for sprites etc
 	private final int screenWidth;
-	private final int screenHeight;
+	public static int screenHeight;
 
 	private GameContactListener contactListener;
-	private static final float GAP_BETWEEN_TOPBOTTOMWALL_AND_EDGE = 3.0f;
 
 	// Used for Box2D
 	private final float worldWidth;
 	private final float worldHeight;
 	private static int PIXELS_PER_METER = 10;
 
-	private final Vector2 center;
+	public static Vector2 center = new Vector2();
 	private final OrthographicCamera camera;
 
 	private final SpriteBatch spriteBatch;
@@ -65,15 +64,15 @@ public class GameScreen implements Screen {
 		this.game = game;
 
 		this.screenWidth = this.game.screenWidth;
-		this.screenHeight = this.game.screenHeight;
+		screenHeight = this.game.screenHeight;
 
-		this.worldHeight = this.screenHeight / PIXELS_PER_METER;
+		this.worldHeight = screenHeight / PIXELS_PER_METER;
 		this.worldWidth = this.screenWidth / PIXELS_PER_METER;
 
-		this.center = new Vector2(worldWidth / 2, worldHeight / 2);
+		center = new Vector2(worldWidth / 2, worldHeight / 2);
 
 		this.camera = new OrthographicCamera();
-		this.camera.setToOrtho(false, this.screenWidth, this.screenHeight);
+		this.camera.setToOrtho(false, this.screenWidth, screenHeight);
 
 		spriteBatch = new SpriteBatch();
 
@@ -156,8 +155,7 @@ public class GameScreen implements Screen {
 		if (position.x < 3 || position.x > 190) {
 			// reverseBallDirection(true);
 		} else if (position.y > screenHeight / 6 || position.y < 3) {
-			if (position.x > this.center.x - 30
-					&& position.x < this.center.x + 30) {
+			if (position.x > center.x - 30 && position.x < center.x + 30) {
 				goalScored();
 			} else {
 				// reverseBallDirection(false);
@@ -165,9 +163,8 @@ public class GameScreen implements Screen {
 		}
 	}
 
-	private void goalScored() {
+	static void goalScored() {
 		System.out.println("Goal Scored");
-
 	}
 
 	private void updatePlayerPositions() {
@@ -239,14 +236,6 @@ public class GameScreen implements Screen {
 			if (distanceOfBallFromPlayer < minDist) {
 				minDist = distanceOfBallFromPlayer;
 
-				if (minDist < 3 && ball.getBallHeight() < Player.PLAYER_HEIGHT) {
-					player.setHasBall(true);
-					attacking = true;
-					GameScreen.ballAtFeet = true;
-				} else {
-					player.setHasBall(false);
-					GameScreen.ballAtFeet = false;
-				}
 				// reset all 'IsClosestPlayerToBall' player values to false as
 				// there is a 'new' closest player value
 				resetClosePlayerBools(playerList);
@@ -270,64 +259,78 @@ public class GameScreen implements Screen {
 
 	}
 
+	// TODO Starting positions and defending positions are the same for the
+	// moment
 	private void createPlayers() {
 
 		// create a full team of players here. use starting positions using
 		// map and player number as the index
 		Player player1 = new Player(world, new Vector2(this.screenWidth / 2
 				/ PIXELS_PER_METER, 15), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 15), new Vector2(this.screenWidth / 2
+				/ PIXELS_PER_METER, 20), new Vector2(this.screenWidth / 2
 				/ PIXELS_PER_METER, 15), camera);
 
-		Player player2 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 20), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 20), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 20), camera);
-
-		Player player3 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 30), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 30), new Vector2(this.screenWidth / 2
+		Player player2 = new Player(world, new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 30), new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 70), new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 30), camera);
 
-		Player player4 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 40), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 40), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 40), camera);
+		Player player3 = new Player(
+				world,
+				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 30),
+				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 70),
+				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 30),
+				camera);
 
-		Player player5 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 50), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 50), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 50), camera);
+		Player player4 = new Player(
+				world,
+				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 30),
+				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 70),
+				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 30),
+				camera);
 
-		Player player6 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 60), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 60), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 60), camera);
+		Player player5 = new Player(world, new Vector2(
+				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 30),
+				new Vector2(((this.screenWidth - 200) / 2) * 2
+						/ PIXELS_PER_METER, 70), new Vector2(
+						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
+						30), camera);
 
-		Player player7 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 70), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 70), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 70), camera);
-
-		Player player8 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 80), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 80), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 80), camera);
-
-		Player player9 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 90), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 90), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 90), camera);
-
-		Player player10 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 100), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 100), new Vector2(this.screenWidth / 2
+		Player player6 = new Player(world, new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 100), new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 140), new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 100), camera);
 
-		Player player11 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 110), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 110), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 110), camera);
+		Player player7 = new Player(world, new Vector2((this.screenWidth + 150)
+				/ 2 / PIXELS_PER_METER, 100), new Vector2(
+				(this.screenWidth + 150) / 2 / PIXELS_PER_METER, 140),
+				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER,
+						100), camera);
+
+		Player player8 = new Player(world, new Vector2((this.screenWidth - 150)
+				/ 2 / PIXELS_PER_METER, 100), new Vector2(
+				(this.screenWidth - 150) / 2 / PIXELS_PER_METER, 140),
+				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER,
+						100), camera);
+
+		Player player9 = new Player(world, new Vector2(
+				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 100),
+				new Vector2(((this.screenWidth - 200) / 2) * 2
+						/ PIXELS_PER_METER, 140), new Vector2(
+						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
+						100), camera);
+
+		Player player10 = new Player(world, new Vector2(
+				(this.screenWidth + 100) / 2 / PIXELS_PER_METER, 120),
+				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER,
+						160), new Vector2((this.screenWidth + 100) / 2
+						/ PIXELS_PER_METER, 120), camera);
+
+		Player player11 = new Player(world, new Vector2(
+				(this.screenWidth - 100) / 2 / PIXELS_PER_METER, 120),
+				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER,
+						160), new Vector2((this.screenWidth - 100) / 2
+						/ PIXELS_PER_METER, 120), camera);
 
 		playerMap.put(1, player1);
 		playerMap.put(2, player2);
@@ -362,19 +365,17 @@ public class GameScreen implements Screen {
 	// the fourth side is the end line
 	private void addGoals() {
 		// bottom goal
-		new BoxProp(world, 1, 10, new Vector2(this.center.x - 30, -1),
-				Line.sideLine); // left
-		new BoxProp(world, 1, 10, new Vector2(this.center.x + 30, -1),
-				Line.sideLine); // right
-		new BoxProp(world, 60, 1, new Vector2(this.center.x, -6), Line.endLine); // back
+		new BoxProp(world, 1, 10, new Vector2(center.x - 30, -1), Line.sideLine); // left
+		new BoxProp(world, 1, 10, new Vector2(center.x + 30, -1), Line.sideLine); // right
+		new BoxProp(world, 60, 1, new Vector2(center.x, -6), Line.endLine); // back
 
 		// top goal
-		new BoxProp(world, 1, 10, new Vector2(this.center.x - 30,
-				this.screenHeight / 6 + 4), Line.sideLine); // left
-		new BoxProp(world, 1, 10, new Vector2(this.center.x + 30,
-				this.screenHeight / 6 + 4), Line.sideLine); // right
-		new BoxProp(world, 60, 1, new Vector2(this.center.x,
-				this.screenHeight / 6 + 10), Line.endLine); // back
+		new BoxProp(world, 1, 10, new Vector2(center.x - 30,
+				screenHeight / 6 + 4), Line.sideLine); // left
+		new BoxProp(world, 1, 10, new Vector2(center.x + 30,
+				screenHeight / 6 + 4), Line.sideLine); // right
+		new BoxProp(world, 60, 1, new Vector2(center.x, screenHeight / 6 + 10),
+				Line.endLine); // back
 	}
 
 	private void addBall() {

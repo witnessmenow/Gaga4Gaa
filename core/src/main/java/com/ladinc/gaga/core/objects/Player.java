@@ -119,7 +119,7 @@ public class Player {
 
 		this.body.createFixture(fixtureDef);
 
-		this.body.setUserData(new CollisionInfo("ball",
+		this.body.setUserData(new CollisionInfo("player",
 				CollisionObjectType.Player, this));
 
 		// this.body.setUserData(new CollisionInfo("",

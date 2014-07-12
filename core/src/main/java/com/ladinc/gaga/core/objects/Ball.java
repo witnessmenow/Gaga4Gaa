@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.ladinc.gaga.core.collision.CollisionInfo;
 import com.ladinc.gaga.core.collision.CollisionInfo.CollisionObjectType;
 import com.ladinc.gaga.core.objects.BoxProp.Line;
+import com.ladinc.gaga.screens.GameScreen;
 
 public class Ball {
 	public Body body;
@@ -58,7 +59,11 @@ public class Ball {
 
 	public void playerHasBall(Player player) {
 		this.body.setLinearVelocity(new Vector2(0, 0));
-		// this.body.setTransform(player.body.getWorldCenter(), 0);
+
+		// attacking will be set to true unless the ball touches an
+		// opponent
+		GameScreen.attacking = true;
+		GameScreen.ballAtFeet = true;
 	}
 
 	public void reverseBallDirection(Line wall) {
@@ -96,9 +101,6 @@ public class Ball {
 		this.body.setUserData(new CollisionInfo("ball",
 				CollisionObjectType.Ball, this));
 
-		// this.body.setUserData(new CollisionInfo("Ball",
-		// CollisionObjectType.Ball));
-
 		dynamicCircle.dispose();
 
 		// this.body.setLinearDamping(BallSpeedPicker.getSlowDown());
@@ -119,11 +121,6 @@ public class Ball {
 
 		Gdx.app.debug("Ball Update", "Ball Position - " + position
 				+ "Ball Velocity - " + currentVelocity);
-
-		// this.body.applyForce(this.body.getWorldVector(new Vector2(
-		// -(currentVelocity.x * (slowDownMultiplier)), -(currentVelocity.y *
-		// (slowDownMultiplier)))), position, true);
-
 	}
 
 	public void resetPositionToStart(Vector2 startPoint) {

@@ -27,7 +27,7 @@ public class CollisionInfo {
 	}
 
 	public static enum CollisionObjectType {
-		Wall, Player, VehicleSensor, ScoreZone, Ball, Pocket, BallSensor, FloorSensor
+		Wall, Player, VehicleSensor, ScoreZone, Ball, Pocket, BallSensor, FloorSensor, AIPLayer
 	};
 
 }

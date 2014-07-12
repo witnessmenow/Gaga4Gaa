@@ -14,7 +14,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.ladinc.gaga.core.collision.CollisionInfo;
 import com.ladinc.gaga.core.collision.CollisionInfo.CollisionObjectType;
 
-public class Player {
+public class AIPlayer {
 
 	public static final double PLAYER_HEIGHT = 10;
 
@@ -29,16 +29,6 @@ public class Player {
 
 	private final OrthographicCamera camera;
 
-	private int playerNumber;
-
-	public int getPlayerNumber() {
-		return playerNumber;
-	}
-
-	public void setPlayerNumber(int playerNumber) {
-		this.playerNumber = playerNumber;
-	}
-
 	public static float PLAYER_SPEED = 10;
 
 	private final Vector2 leftMovement = new Vector2(0, 0);
@@ -50,6 +40,16 @@ public class Player {
 
 	private Vector2 attackingPos;
 	private Vector2 defendingPos;
+
+	private int playerNumber;
+
+	public int getPlayerNumber() {
+		return playerNumber;
+	}
+
+	public void setPlayerNumber(int playerNumber) {
+		this.playerNumber = playerNumber;
+	}
 
 	public Vector2 getAttackingPos() {
 		return attackingPos;
@@ -91,7 +91,7 @@ public class Player {
 		this.isClosestPlayerToBall = closestPlayerToBall;
 	}
 
-	public Player(World world, Vector2 startPos, Vector2 attackingPos,
+	public AIPlayer(World world, Vector2 startPos, Vector2 attackingPos,
 			Vector2 defendingPos, int number, OrthographicCamera camera) {
 
 		this.world = world;
@@ -104,7 +104,7 @@ public class Player {
 
 		createBody(startPos);
 
-		this.sprite = Player.getPlayerSprite();
+		this.sprite = AIPlayer.getPlayerSprite();
 	}
 
 	private void createBody(Vector2 startPos) {
@@ -131,8 +131,8 @@ public class Player {
 
 		this.body.createFixture(fixtureDef);
 
-		this.body.setUserData(new CollisionInfo("player",
-				CollisionObjectType.Player, this));
+		this.body.setUserData(new CollisionInfo("aiplayer",
+				CollisionObjectType.AIPLayer, this));
 
 		// this.body.setUserData(new CollisionInfo("",
 		// CollisionObjectType.Player, this));

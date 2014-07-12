@@ -18,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.ladinc.gaga.core.Gaga;
+import com.ladinc.gaga.core.objects.AIPlayer;
 import com.ladinc.gaga.core.objects.Ball;
 import com.ladinc.gaga.core.objects.BoxProp;
 import com.ladinc.gaga.core.objects.BoxProp.Line;
@@ -55,7 +56,9 @@ public class GameScreen implements Screen {
 
 	private Texture ballTexture;
 	public static Ball ball;
-	public static Map<Integer, Player> playerMap = new HashMap<Integer, Player>();
+	public static Map<Integer, Player> homeTeamPlayerMap = new HashMap<Integer, Player>();
+
+	public static Map<Integer, AIPlayer> awayTeamPlayerMap = new HashMap<Integer, AIPlayer>();
 
 	public static boolean attacking = false;
 	public static boolean ballAtFeet;
@@ -174,12 +177,13 @@ public class GameScreen implements Screen {
 		// return to target position for defending,,
 		// which is their starting positions
 
-		for (Entry<Integer, Player> entry : playerMap.entrySet()) {
+		for (Entry<Integer, Player> entry : homeTeamPlayerMap.entrySet()) {
 			Player player = entry.getValue();
 			Vector2 linearVel;
 
 			// get closest player to ball
-			setClosestPlayerToBall(new ArrayList<Player>(playerMap.values()));
+			setClosestPlayerToBall(new ArrayList<Player>(
+					homeTeamPlayerMap.values()));
 
 			// TODO: Should players move while they have the ball?
 			if (attacking && !player.getHasBall()) {
@@ -261,88 +265,88 @@ public class GameScreen implements Screen {
 
 	// TODO Starting positions and defending positions are the same for the
 	// moment
-	private void createPlayers() {
+	private void addHomeTeam() {
 
 		// create a full team of players here. use starting positions using
 		// map and player number as the index
 		Player player1 = new Player(world, new Vector2(this.screenWidth / 2
 				/ PIXELS_PER_METER, 15), new Vector2(this.screenWidth / 2
 				/ PIXELS_PER_METER, 20), new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 15), camera);
+				/ PIXELS_PER_METER, 15), 1, camera);
 
 		Player player2 = new Player(world, new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 30), new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 70), new Vector2(this.screenWidth / 6
-				/ PIXELS_PER_METER, 30), camera);
+				/ PIXELS_PER_METER, 30), 2, camera);
 
 		Player player3 = new Player(
 				world,
 				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 30),
 				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 70),
 				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 30),
-				camera);
+				3, camera);
 
 		Player player4 = new Player(
 				world,
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 30),
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 70),
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 30),
-				camera);
+				4, camera);
 
 		Player player5 = new Player(world, new Vector2(
 				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 30),
 				new Vector2(((this.screenWidth - 200) / 2) * 2
 						/ PIXELS_PER_METER, 70), new Vector2(
 						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
-						30), camera);
+						30), 5, camera);
 
 		Player player6 = new Player(world, new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 100), new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 140), new Vector2(this.screenWidth / 6
-				/ PIXELS_PER_METER, 100), camera);
+				/ PIXELS_PER_METER, 100), 6, camera);
 
 		Player player7 = new Player(world, new Vector2((this.screenWidth + 150)
 				/ 2 / PIXELS_PER_METER, 100), new Vector2(
 				(this.screenWidth + 150) / 2 / PIXELS_PER_METER, 140),
 				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER,
-						100), camera);
+						100), 7, camera);
 
 		Player player8 = new Player(world, new Vector2((this.screenWidth - 150)
 				/ 2 / PIXELS_PER_METER, 100), new Vector2(
 				(this.screenWidth - 150) / 2 / PIXELS_PER_METER, 140),
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER,
-						100), camera);
+						100), 8, camera);
 
 		Player player9 = new Player(world, new Vector2(
 				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 100),
 				new Vector2(((this.screenWidth - 200) / 2) * 2
 						/ PIXELS_PER_METER, 140), new Vector2(
 						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
-						100), camera);
+						100), 9, camera);
 
 		Player player10 = new Player(world, new Vector2(
 				(this.screenWidth + 100) / 2 / PIXELS_PER_METER, 120),
 				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER,
 						160), new Vector2((this.screenWidth + 100) / 2
-						/ PIXELS_PER_METER, 120), camera);
+						/ PIXELS_PER_METER, 120), 10, camera);
 
 		Player player11 = new Player(world, new Vector2(
 				(this.screenWidth - 100) / 2 / PIXELS_PER_METER, 120),
 				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER,
 						160), new Vector2((this.screenWidth - 100) / 2
-						/ PIXELS_PER_METER, 120), camera);
+						/ PIXELS_PER_METER, 120), 11, camera);
 
-		playerMap.put(1, player1);
-		playerMap.put(2, player2);
-		playerMap.put(3, player3);
-		playerMap.put(4, player4);
-		playerMap.put(5, player5);
-		playerMap.put(6, player6);
-		playerMap.put(7, player7);
-		playerMap.put(8, player8);
-		playerMap.put(9, player9);
-		playerMap.put(10, player10);
-		playerMap.put(11, player11);
+		homeTeamPlayerMap.put(1, player1);
+		homeTeamPlayerMap.put(2, player2);
+		homeTeamPlayerMap.put(3, player3);
+		homeTeamPlayerMap.put(4, player4);
+		homeTeamPlayerMap.put(5, player5);
+		homeTeamPlayerMap.put(6, player6);
+		homeTeamPlayerMap.put(7, player7);
+		homeTeamPlayerMap.put(8, player8);
+		homeTeamPlayerMap.put(9, player9);
+		homeTeamPlayerMap.put(10, player10);
+		homeTeamPlayerMap.put(11, player11);
 	}
 
 	@Override
@@ -356,9 +360,98 @@ public class GameScreen implements Screen {
 		addWalls();
 		addGoals();
 
-		createPlayers();
+		addHomeTeam();
+		addAwayTeam();
 
 		addBall();
+	}
+
+	private void addAwayTeam() {
+		// create a full team of players here. use starting positions using
+		// map and player number as the index
+		AIPlayer player1 = new AIPlayer(world, new Vector2(this.screenWidth / 2
+				/ PIXELS_PER_METER, 165), new Vector2(this.screenWidth / 2
+				/ PIXELS_PER_METER, 165), new Vector2(this.screenWidth / 2
+				/ PIXELS_PER_METER, 165), 1, camera);
+
+		AIPlayer player2 = new AIPlayer(world, new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 150), new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 70), new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 150), 2, camera);
+
+		AIPlayer player3 = new AIPlayer(
+				world,
+				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER,
+						150),
+				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 70),
+				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER,
+						150), 3, camera);
+
+		AIPlayer player4 = new AIPlayer(
+				world,
+				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER,
+						150),
+				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 70),
+				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER,
+						150), 4, camera);
+
+		AIPlayer player5 = new AIPlayer(world, new Vector2(
+				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 150),
+				new Vector2(((this.screenWidth - 200) / 2) * 2
+						/ PIXELS_PER_METER, 70), new Vector2(
+						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
+						150), 5, camera);
+
+		AIPlayer player6 = new AIPlayer(world, new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 100), new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 100), new Vector2(this.screenWidth / 6
+				/ PIXELS_PER_METER, 100), 6, camera);
+
+		AIPlayer player7 = new AIPlayer(world, new Vector2(
+				(this.screenWidth + 150) / 2 / PIXELS_PER_METER, 100),
+				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER,
+						100), new Vector2((this.screenWidth + 150) / 2
+						/ PIXELS_PER_METER, 100), 7, camera);
+
+		AIPlayer player8 = new AIPlayer(world, new Vector2(
+				(this.screenWidth - 150) / 2 / PIXELS_PER_METER, 100),
+				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER,
+						100), new Vector2((this.screenWidth - 150) / 2
+						/ PIXELS_PER_METER, 100), 8, camera);
+
+		AIPlayer player9 = new AIPlayer(world, new Vector2(
+				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 100),
+				new Vector2(((this.screenWidth - 200) / 2) * 2
+						/ PIXELS_PER_METER, 100), new Vector2(
+						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
+						100), 9, camera);
+
+		AIPlayer player10 = new AIPlayer(
+				world,
+				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER, 80),
+				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER, 80),
+				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER, 80),
+				10, camera);
+
+		AIPlayer player11 = new AIPlayer(
+				world,
+				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER, 80),
+				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER, 80),
+				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER, 80),
+				11, camera);
+
+		awayTeamPlayerMap.put(1, player1);
+		awayTeamPlayerMap.put(2, player2);
+		awayTeamPlayerMap.put(3, player3);
+		awayTeamPlayerMap.put(4, player4);
+		awayTeamPlayerMap.put(5, player5);
+		awayTeamPlayerMap.put(6, player6);
+		awayTeamPlayerMap.put(7, player7);
+		awayTeamPlayerMap.put(8, player8);
+		awayTeamPlayerMap.put(9, player9);
+		awayTeamPlayerMap.put(10, player10);
+		awayTeamPlayerMap.put(11, player11);
+
 	}
 
 	// goals will just be simple rectangles, formed using 3 narrow boxes, and

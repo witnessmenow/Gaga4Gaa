@@ -6,15 +6,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
-import com.ladinc.gaga.core.collision.CollisionInfo;
-import com.ladinc.gaga.core.collision.CollisionInfo.CollisionObjectType;
 
-public class Player {
+public abstract class Player {
 
 	public static final double PLAYER_HEIGHT = 10;
 
@@ -25,9 +19,9 @@ public class Player {
 	public Sprite sprite;
 
 	public Body body;
-	private final World world;
+	public World world;
 
-	private final OrthographicCamera camera;
+	protected OrthographicCamera camera;
 
 	private int playerNumber;
 
@@ -44,12 +38,24 @@ public class Player {
 	private final Vector2 leftMovement = new Vector2(0, 0);
 	private boolean isClosestPlayerToBall = false;
 
+	public void setClosestPlayerToBall(boolean isClosestPlayerToBall) {
+		this.isClosestPlayerToBall = isClosestPlayerToBall;
+	}
+
+	public boolean isClosestPlayerToBall() {
+		return isClosestPlayerToBall;
+	}
+
+	public double getDistFromBall() {
+		return distFromBall;
+	}
+
 	public double distFromBall;
 
 	private boolean hasBall = false;
 
-	private Vector2 attackingPos;
-	private Vector2 defendingPos;
+	protected Vector2 attackingPos;
+	protected Vector2 defendingPos;
 
 	public Vector2 getAttackingPos() {
 		return attackingPos;
@@ -73,69 +79,6 @@ public class Player {
 
 	public void setHasBall(boolean hasBall) {
 		this.hasBall = hasBall;
-	}
-
-	public double getDistFromBall() {
-		return distFromBall;
-	}
-
-	public void setDistFromBall(double d) {
-		this.distFromBall = d;
-	}
-
-	public boolean getIsClosestPlayerToBall() {
-		return isClosestPlayerToBall;
-	}
-
-	public void setIsClosestPlayerToBall(boolean closestPlayerToBall) {
-		this.isClosestPlayerToBall = closestPlayerToBall;
-	}
-
-	public Player(World world, Vector2 startPos, Vector2 attackingPos,
-			Vector2 defendingPos, int number, OrthographicCamera camera) {
-
-		this.world = world;
-		this.camera = camera;
-
-		this.attackingPos = attackingPos;
-		this.defendingPos = defendingPos;
-
-		this.setPlayerNumber(number);
-
-		createBody(startPos);
-
-		this.sprite = Player.getPlayerSprite();
-	}
-
-	private void createBody(Vector2 startPos) {
-		// Dynamic Body
-		BodyDef bodyDef = new BodyDef();
-		bodyDef.type = BodyType.DynamicBody; // TODO Should this be dynamic so
-												// that it can 'hit' the ball
-
-		bodyDef.position.set(startPos.x, startPos.y);
-
-		// This keeps it that the force up is applied relative to the screen,
-		// rather than the direction that the player is facing
-		bodyDef.fixedRotation = true;
-		this.body = world.createBody(bodyDef);
-
-		CircleShape dynamicCircle = new CircleShape();
-		dynamicCircle.setRadius(playerSize);
-
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.density = 10.0f;
-		fixtureDef.friction = 0.3f;
-		fixtureDef.restitution = 0.5f;
-		fixtureDef.shape = dynamicCircle;
-
-		this.body.createFixture(fixtureDef);
-
-		this.body.setUserData(new CollisionInfo("player",
-				CollisionObjectType.Player, this));
-
-		// this.body.setUserData(new CollisionInfo("",
-		// CollisionObjectType.Player, this));
 	}
 
 	public void updateSprite(SpriteBatch spriteBatch) {
@@ -174,35 +117,6 @@ public class Player {
 		relativeVector.y = normalizeFloat(relativeVector.y, 1f);
 
 		return relativeVector;
-		//
-		// Vector2 temp = new Vector2(playerLocation.x - aiLocation.x,
-		// (playerLocation.y - aiLocation.y));
-		//
-		// int direcitonX = 1;
-		// int directionY = 1;
-		//
-		// if (temp.x < 0) {
-		// direcitonX = -1;
-		// }
-		//
-		// if (temp.y < 1) {
-		// directionY = -1;
-		// }
-		//
-		// float absX = Math.abs(temp.x);
-		// float absY = Math.abs(temp.y);
-		//
-		// if (absX > absY) {
-		// temp.x = direcitonX * 1;
-		// temp.y = directionY * (absY / absX);
-		// } else {
-		//
-		// temp.y = directionY * 1;
-		// temp.x = direcitonX * (absX / absY);
-		//
-		// }
-		// return temp;
-
 	}
 
 	public float normalizeFloat(float value, float limit) {
@@ -213,4 +127,10 @@ public class Player {
 		}
 
 	}
+
+	public void setDistFromBall(double d) {
+		this.distFromBall = d;
+	}
+
+	public abstract void createBody(Vector2 startPos);
 }

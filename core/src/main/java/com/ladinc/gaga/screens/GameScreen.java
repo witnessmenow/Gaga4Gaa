@@ -2,8 +2,8 @@ package com.ladinc.gaga.screens;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -23,6 +23,7 @@ import com.ladinc.gaga.core.objects.Ball;
 import com.ladinc.gaga.core.objects.BoxProp;
 import com.ladinc.gaga.core.objects.BoxProp.Line;
 import com.ladinc.gaga.core.objects.Player;
+import com.ladinc.gaga.core.objects.UserPlayer;
 
 public class GameScreen implements Screen {
 	private static final String BALL = "BALL";
@@ -56,7 +57,7 @@ public class GameScreen implements Screen {
 
 	private Texture ballTexture;
 	public static Ball ball;
-	public static Map<Integer, Player> homeTeamPlayerMap = new HashMap<Integer, Player>();
+	public static Map<Integer, UserPlayer> homeTeamPlayerMap = new HashMap<Integer, UserPlayer>();
 
 	public static Map<Integer, AIPlayer> awayTeamPlayerMap = new HashMap<Integer, AIPlayer>();
 
@@ -132,13 +133,37 @@ public class GameScreen implements Screen {
 
 		// updateSprite(textureMap.get(BALL), this.spriteBatch,
 		// PIXELS_PER_METER, ball.body);
-		updatePlayerPositions();
+		updateUserPlayerPositions(new ArrayList<Player>(
+				homeTeamPlayerMap.values()));
+
+		updateAIPlayerPositions();
 
 		checkBallPosition();
 		this.spriteBatch.end();
 
 		debugRenderer.render(world, camera.combined.scale(PIXELS_PER_METER,
 				PIXELS_PER_METER, PIXELS_PER_METER));
+	}
+
+	private void updateAIPlayerPositions() {
+		// if attacking is set, then the ai team are actually defending
+		if (attacking) {
+
+		} else {
+			// when defending, if the ball is at the attacker's players feet,
+			// the closest defender should go towards the ball
+
+			// if the ball is moving, a defender should move to intercept it
+			// TODO Which player should do this though??
+			if (ballAtFeet) {
+				// closest defender should move to the ball
+				setClosestPlayerToBall(new ArrayList<Player>(
+						awayTeamPlayerMap.values()));
+
+				// TODO should we reuse the player movement definitions or just
+				// rewrite here?
+			}
+		}
 	}
 
 	public void moveCamera(float x, float y) {
@@ -170,15 +195,14 @@ public class GameScreen implements Screen {
 		System.out.println("Goal Scored");
 	}
 
-	private void updatePlayerPositions() {
+	private void updateUserPlayerPositions(List<Player> listPlayers) {
 		// if attacking, players should run to attacking target positions, one
 		// per player
 		// if defending, closest player should run to ball, the rest should
 		// return to target position for defending,,
 		// which is their starting positions
 
-		for (Entry<Integer, Player> entry : homeTeamPlayerMap.entrySet()) {
-			Player player = entry.getValue();
+		for (Player player : listPlayers) {
 			Vector2 linearVel;
 
 			// get closest player to ball
@@ -197,8 +221,9 @@ public class GameScreen implements Screen {
 				linearVel = getAttackOrDefendingMovement(player, false);
 			}
 
-			player.body.setLinearVelocity(Player.PLAYER_SPEED * linearVel.x,
-					Player.PLAYER_SPEED * linearVel.y);
+			player.body.setLinearVelocity(
+					UserPlayer.PLAYER_SPEED * linearVel.x,
+					UserPlayer.PLAYER_SPEED * linearVel.y);
 
 			// player.body.setLinearVelocity(Player.PLAYER_SPEED,
 			// Player.PLAYER_SPEED);
@@ -212,12 +237,12 @@ public class GameScreen implements Screen {
 		if (attacking) {
 			movement = player.getMovemenOfPlayerTowardsTargetDest(player.body
 					.getPosition(),
-					player.getIsClosestPlayerToBall() ? ball.getPosition()
+					player.isClosestPlayerToBall() ? ball.getPosition()
 							: player.getAttackingPos());
 		} else {
 			movement = player.getMovemenOfPlayerTowardsTargetDest(player.body
 					.getPosition(),
-					player.getIsClosestPlayerToBall() ? ball.getPosition()
+					player.isClosestPlayerToBall() ? ball.getPosition()
 							: player.getDefendingPos());
 		}
 
@@ -226,7 +251,8 @@ public class GameScreen implements Screen {
 
 	// go through list of players on the field. Set the player that is closest
 	// to the ball
-	// as he will be the only one drawn towards the ball when defending
+	// as he will be the only one drawn towards the ball when defending.
+	// This method will be used for both usrr and ai players
 	private void setClosestPlayerToBall(ArrayList<Player> playerList) {
 		double minDist = 100000000; // some really high number so that at least
 									// one player will definitely be less than
@@ -244,7 +270,7 @@ public class GameScreen implements Screen {
 				// there is a 'new' closest player value
 				resetClosePlayerBools(playerList);
 
-				player.setIsClosestPlayerToBall(true);
+				player.setClosestPlayerToBall(true);
 
 			}
 		}
@@ -252,7 +278,7 @@ public class GameScreen implements Screen {
 
 	private void resetClosePlayerBools(ArrayList<Player> playerList) {
 		for (Player player : playerList) {
-			player.setIsClosestPlayerToBall(false);
+			player.setClosestPlayerToBall(false);
 		}
 
 	}
@@ -269,68 +295,68 @@ public class GameScreen implements Screen {
 
 		// create a full team of players here. use starting positions using
 		// map and player number as the index
-		Player player1 = new Player(world, new Vector2(this.screenWidth / 2
-				/ PIXELS_PER_METER, 15), new Vector2(this.screenWidth / 2
+		UserPlayer player1 = new UserPlayer(world, new Vector2(this.screenWidth
+				/ 2 / PIXELS_PER_METER, 15), new Vector2(this.screenWidth / 2
 				/ PIXELS_PER_METER, 20), new Vector2(this.screenWidth / 2
 				/ PIXELS_PER_METER, 15), 1, camera);
 
-		Player player2 = new Player(world, new Vector2(this.screenWidth / 6
-				/ PIXELS_PER_METER, 30), new Vector2(this.screenWidth / 6
+		UserPlayer player2 = new UserPlayer(world, new Vector2(this.screenWidth
+				/ 6 / PIXELS_PER_METER, 30), new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 70), new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 30), 2, camera);
 
-		Player player3 = new Player(
+		UserPlayer player3 = new UserPlayer(
 				world,
 				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 30),
 				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 70),
 				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER, 30),
 				3, camera);
 
-		Player player4 = new Player(
+		UserPlayer player4 = new UserPlayer(
 				world,
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 30),
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 70),
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER, 30),
 				4, camera);
 
-		Player player5 = new Player(world, new Vector2(
+		UserPlayer player5 = new UserPlayer(world, new Vector2(
 				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 30),
 				new Vector2(((this.screenWidth - 200) / 2) * 2
 						/ PIXELS_PER_METER, 70), new Vector2(
 						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
 						30), 5, camera);
 
-		Player player6 = new Player(world, new Vector2(this.screenWidth / 6
-				/ PIXELS_PER_METER, 100), new Vector2(this.screenWidth / 6
+		UserPlayer player6 = new UserPlayer(world, new Vector2(this.screenWidth
+				/ 6 / PIXELS_PER_METER, 100), new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 140), new Vector2(this.screenWidth / 6
 				/ PIXELS_PER_METER, 100), 6, camera);
 
-		Player player7 = new Player(world, new Vector2((this.screenWidth + 150)
-				/ 2 / PIXELS_PER_METER, 100), new Vector2(
-				(this.screenWidth + 150) / 2 / PIXELS_PER_METER, 140),
+		UserPlayer player7 = new UserPlayer(world, new Vector2(
+				(this.screenWidth + 150) / 2 / PIXELS_PER_METER, 100),
 				new Vector2((this.screenWidth + 150) / 2 / PIXELS_PER_METER,
-						100), 7, camera);
+						140), new Vector2((this.screenWidth + 150) / 2
+						/ PIXELS_PER_METER, 100), 7, camera);
 
-		Player player8 = new Player(world, new Vector2((this.screenWidth - 150)
-				/ 2 / PIXELS_PER_METER, 100), new Vector2(
-				(this.screenWidth - 150) / 2 / PIXELS_PER_METER, 140),
+		UserPlayer player8 = new UserPlayer(world, new Vector2(
+				(this.screenWidth - 150) / 2 / PIXELS_PER_METER, 100),
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER,
-						100), 8, camera);
+						140), new Vector2((this.screenWidth - 150) / 2
+						/ PIXELS_PER_METER, 100), 8, camera);
 
-		Player player9 = new Player(world, new Vector2(
+		UserPlayer player9 = new UserPlayer(world, new Vector2(
 				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 100),
 				new Vector2(((this.screenWidth - 200) / 2) * 2
 						/ PIXELS_PER_METER, 140), new Vector2(
 						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
 						100), 9, camera);
 
-		Player player10 = new Player(world, new Vector2(
+		UserPlayer player10 = new UserPlayer(world, new Vector2(
 				(this.screenWidth + 100) / 2 / PIXELS_PER_METER, 120),
 				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER,
 						160), new Vector2((this.screenWidth + 100) / 2
 						/ PIXELS_PER_METER, 120), 10, camera);
 
-		Player player11 = new Player(world, new Vector2(
+		UserPlayer player11 = new UserPlayer(world, new Vector2(
 				(this.screenWidth - 100) / 2 / PIXELS_PER_METER, 120),
 				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER,
 						160), new Vector2((this.screenWidth - 100) / 2

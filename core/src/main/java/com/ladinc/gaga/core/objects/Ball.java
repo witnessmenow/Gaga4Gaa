@@ -57,7 +57,7 @@ public class Ball {
 		createBallObject(world, x, y, ballSprite, networked);
 	}
 
-	public void playerHasBall(Player player) {
+	public void playerHasBall(UserPlayer player) {
 		this.body.setLinearVelocity(new Vector2(0, 0));
 
 		// attacking will be set to true unless the ball touches an

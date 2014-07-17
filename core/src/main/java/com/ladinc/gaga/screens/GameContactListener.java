@@ -11,7 +11,7 @@ import com.ladinc.gaga.core.collision.CollisionInfo;
 import com.ladinc.gaga.core.collision.CollisionInfo.CollisionObjectType;
 import com.ladinc.gaga.core.objects.Ball;
 import com.ladinc.gaga.core.objects.BoxProp;
-import com.ladinc.gaga.core.objects.Player;
+import com.ladinc.gaga.core.objects.UserPlayer;
 
 public class GameContactListener implements ContactListener {
 
@@ -25,7 +25,7 @@ public class GameContactListener implements ContactListener {
 		CollisionInfo bodyBInfo = getCollisionInfoFromFixture(fixtureB);
 
 		Ball ball;
-		Player player;
+		UserPlayer player;
 		BoxProp wall;
 
 		if (bodyAInfo != null && bodyBInfo != null) {
@@ -39,10 +39,10 @@ public class GameContactListener implements ContactListener {
 					CollisionObjectType.Ball)) {
 				if (bodyAInfo.type == CollisionObjectType.Ball) {
 					ball = (Ball) bodyAInfo.object;
-					player = (Player) bodyBInfo.object;
+					player = (UserPlayer) bodyBInfo.object;
 				} else {
 					ball = (Ball) bodyBInfo.object;
-					player = (Player) bodyAInfo.object;
+					player = (UserPlayer) bodyAInfo.object;
 				}
 
 				ball.playerHasBall(player);
@@ -100,7 +100,7 @@ public class GameContactListener implements ContactListener {
 		CollisionInfo bodyBInfo = getCollisionInfoFromFixture(fixtureB);
 
 		Ball ball;
-		Player player;
+		UserPlayer player;
 
 		if (bodyAInfo != null && bodyBInfo != null) {
 

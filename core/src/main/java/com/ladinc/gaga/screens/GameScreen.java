@@ -147,22 +147,89 @@ public class GameScreen implements Screen {
 
 	private void updateAIPlayerPositions() {
 		// if attacking is set, then the ai team are actually defending
+		ArrayList<Player> listAwayPlayers = new ArrayList<Player>(
+				awayTeamPlayerMap.values());
+
+		resetClosePlayerBools(listAwayPlayers);
+		setClosestPlayerToBall(listAwayPlayers);
+		Player closestAwayPlayer = getClosestPlayer(listAwayPlayers);
+
 		if (attacking) {
-
-		} else {
-			// when defending, if the ball is at the attacker's players feet,
-			// the closest defender should go towards the ball
-
-			// if the ball is moving, a defender should move to intercept it
-			// TODO Which player should do this though??
 			if (ballAtFeet) {
-				// closest defender should move to the ball
-				setClosestPlayerToBall(new ArrayList<Player>(
-						awayTeamPlayerMap.values()));
+				// when defending, if the ball is at the attacker's players
+				// feet,
+				// the closest defender should go towards the ball
 
-				// TODO should we reuse the player movement definitions or just
-				// rewrite here?
+				// if the ball is moving, a defender should move to intercept it
+				// TODO Which player should do this though??
+
+				// closest defender should move to the ball
+				Vector2 aiPLayerToBallVector = getAttackOrDefendingMovement(
+						closestAwayPlayer, false);
+
+				// TODO maybe have different values for Player.PLAYER_SPEED
+				// depending on the difficulty of the away team
+				closestAwayPlayer.body.setLinearVelocity(
+						(Player.PLAYER_SPEED * aiPLayerToBallVector.x),
+						(Player.PLAYER_SPEED * aiPLayerToBallVector.y));
+
+			} else {
+				// Using formulae from
+				// http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
+
+				float xCompSq = ball.body.getLinearVelocity().x
+						* ball.body.getLinearVelocity().x;
+				float yCompSq = ball.body.getLinearVelocity().y
+						* ball.body.getLinearVelocity().y;
+
+				float ballSpeed = (float) Math.pow((xCompSq + yCompSq), 0.5);
+
+				float a = (float) (((ball.body.getLinearVelocity().x) * (ball.body
+						.getLinearVelocity().x))
+						+ ((ball.body.getLinearVelocity().y) * (ball.body
+								.getLinearVelocity().y)) - Math.pow(ballSpeed,
+						0.5));
+
+				float b = 2 * (ball.body.getLinearVelocity().x
+						* (ball.body.getWorldCenter().x - closestAwayPlayer.body
+								.getWorldCenter().x) + ball.body
+						.getLinearVelocity().y
+						* (ball.body.getWorldCenter().y - closestAwayPlayer.body
+								.getWorldCenter().y));
+
+				float c = (ball.body.getWorldCenter().x - closestAwayPlayer.body
+						.getWorldCenter().x)
+						+ (ball.body.getWorldCenter().y - closestAwayPlayer.body
+								.getWorldCenter().y)
+						* (ball.body.getWorldCenter().y - closestAwayPlayer.body
+								.getWorldCenter().y);
+
+				float disc = (float) Math.pow(b, 0.5) - 4 * a * c;
+
+				float t1 = (float) (-b + Math.pow(disc, 0.5)) / (2 * a);
+				float t2 = (float) (-b - Math.pow(disc, 0.5)) / (2 * a);
+
+				float t = 0;
+
+				if (t1 < t2 && t1 > 0) {
+					t = t1;
+				} else if (t2 < t1 && t2 > 0) {
+					t = t2;
+				} else if (t1 > 0) {
+					t = t1;
+				} else if (t2 > 0) {
+					t = t2;
+				}
+
+				float aimX = t * ball.body.getLinearVelocity().x
+						+ ball.body.getWorldCenter().x;
+				float aimY = t * ball.body.getLinearVelocity().y
+						+ ball.body.getWorldCenter().y;
+
+				Vector2 aiPlayerMovement = new Vector2(aimX, aimY);
+				closestAwayPlayer.body.setLinearVelocity(aiPlayerMovement);
 			}
+		} else { // defending, but AITeam are attacking
 		}
 	}
 
@@ -247,6 +314,16 @@ public class GameScreen implements Screen {
 		}
 
 		return movement;
+	}
+
+	private Player getClosestPlayer(ArrayList<Player> playerList) {
+		for (Player player : playerList) {
+			if (player.isClosestPlayerToBall()) {
+
+				return player;
+			}
+		}
+		return null;
 	}
 
 	// go through list of players on the field. Set the player that is closest

@@ -174,63 +174,165 @@ public class GameScreen implements Screen {
 						(Player.PLAYER_SPEED * aiPLayerToBallVector.y));
 
 			} else {
-				// Using formulae from
-				// http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
-
-				float xCompSq = ball.body.getLinearVelocity().x
-						* ball.body.getLinearVelocity().x;
-				float yCompSq = ball.body.getLinearVelocity().y
-						* ball.body.getLinearVelocity().y;
-
-				float ballSpeed = (float) Math.pow((xCompSq + yCompSq), 0.5);
-
-				float a = (float) (((ball.body.getLinearVelocity().x) * (ball.body
-						.getLinearVelocity().x))
-						+ ((ball.body.getLinearVelocity().y) * (ball.body
-								.getLinearVelocity().y)) - Math.pow(ballSpeed,
-						0.5));
-
-				float b = 2 * (ball.body.getLinearVelocity().x
-						* (ball.body.getWorldCenter().x - closestAwayPlayer.body
-								.getWorldCenter().x) + ball.body
-						.getLinearVelocity().y
-						* (ball.body.getWorldCenter().y - closestAwayPlayer.body
-								.getWorldCenter().y));
-
-				float c = (ball.body.getWorldCenter().x - closestAwayPlayer.body
-						.getWorldCenter().x)
-						+ (ball.body.getWorldCenter().y - closestAwayPlayer.body
-								.getWorldCenter().y)
-						* (ball.body.getWorldCenter().y - closestAwayPlayer.body
-								.getWorldCenter().y);
-
-				float disc = (float) Math.pow(b, 0.5) - 4 * a * c;
-
-				float t1 = (float) (-b + Math.pow(disc, 0.5)) / (2 * a);
-				float t2 = (float) (-b - Math.pow(disc, 0.5)) / (2 * a);
-
-				float t = 0;
-
-				if (t1 < t2 && t1 > 0) {
-					t = t1;
-				} else if (t2 < t1 && t2 > 0) {
-					t = t2;
-				} else if (t1 > 0) {
-					t = t1;
-				} else if (t2 > 0) {
-					t = t2;
-				}
-
-				float aimX = t * ball.body.getLinearVelocity().x
-						+ ball.body.getWorldCenter().x;
-				float aimY = t * ball.body.getLinearVelocity().y
-						+ ball.body.getWorldCenter().y;
-
-				Vector2 aiPlayerMovement = new Vector2(aimX, aimY);
-				closestAwayPlayer.body.setLinearVelocity(aiPlayerMovement);
+//				// Using formulae from
+//				// http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
+//
+//				float xCompSq = ball.body.getLinearVelocity().x
+//						* ball.body.getLinearVelocity().x;
+//				float yCompSq = ball.body.getLinearVelocity().y
+//						* ball.body.getLinearVelocity().y;
+//
+//				//float ballSpeed = (float) Math.pow((xCompSq + yCompSq), 0.5);
+//				
+//				float ballSpeedSq = UserPlayer.PLAYER_SPEED * UserPlayer.PLAYER_SPEED;
+//
+//				float a = (float) (xCompSq + yCompSq - ballSpeedSq);
+//				
+//				Gdx.app.debug("Disc", "a" + a);
+//
+//				float b = 2  
+//						*
+//						(ball.body.getLinearVelocity().x * (ball.body.getWorldCenter().x - closestAwayPlayer.body.getWorldCenter().x)
+//						+
+//						ball.body.getLinearVelocity().y * (ball.body.getWorldCenter().y - closestAwayPlayer.body.getWorldCenter().y));
+//
+//				Gdx.app.debug("Disc", "b" + b);
+//				
+//				float c = (float) ((Math.pow((ball.body.getWorldCenter().x - closestAwayPlayer.body.getWorldCenter().x), 2))
+//								+
+//								(Math.pow((ball.body.getWorldCenter().y - closestAwayPlayer.body.getWorldCenter().y), 2)));
+//
+//				
+//				Gdx.app.debug("Disc", "c" + c);
+//
+//				float disc = (float) Math.pow(b, 2) - 4 * a * c;
+//
+//				Gdx.app.debug("Disc", "Disc" + disc);
+//				
+//				float t1 = (float) (-b + Math.pow(disc, 0.5)) / (2 * a);
+//				float t2 = (float) (-b - Math.pow(disc, 0.5)) / (2 * a);
+//
+//				float t = 0;
+//
+//				if (t1 < t2 && t1 > 0) {
+//					t = t1;
+//				} else if (t2 < t1 && t2 > 0) {
+//					t = t2;
+//				}
+//
+//				float aimX = (t * ball.body.getLinearVelocity().x)
+//						+ ball.body.getWorldCenter().x;
+//				float aimY = (t * ball.body.getLinearVelocity().y)
+//						+ ball.body.getWorldCenter().y;
+//
+//				Vector2 aiPlayerMovement = new Vector2(aimX, aimY);
+//				closestAwayPlayer.body.setLinearVelocity(aiPlayerMovement);
+				
+				setPlayerMovement(closestAwayPlayer);
 			}
 		} else { // defending, but AITeam are attacking
 		}
+	}
+	
+	//adapted from here
+	//http://www.box2d.org/forum/viewtopic.php?f=3&t=8833
+	
+	public void setPlayerMovement(Player closestAwayPlayer)
+	{
+		Vector2 ballPosition = this.ball.body.getWorldCenter();
+		Vector2 playerPosition = closestAwayPlayer.body.getWorldCenter();
+		
+		Vector2 ballMovementDirection = this.ball.body.getLinearVelocity();
+		
+		float ballSpeed = this.ball.body.getLinearVelocity().len();
+		float playerSpeed = new Vector2(Player.PLAYER_SPEED, Player.PLAYER_SPEED).len();
+		
+		Vector2 offsetToBall = new Vector2(ballPosition.x - playerPosition.x, ballPosition.y - playerPosition.y);
+		
+		float distanceFromPlayerToBallAtInterception = Math.abs(ballMovementDirection.crs(offsetToBall));
+		float distanceBallTravelsToPassPlayer  = - ballMovementDirection.dot(offsetToBall);
+		
+		float ballSpeerSqr = (float) Math.pow(ballSpeed, 2);
+		float playerSpeerSqr = (float) Math.pow(playerSpeed, 2);
+		
+		float timeUntilBallPassesPlayer = (float) (ballSpeed == 0.0f ? 0.0f : distanceBallTravelsToPassPlayer / ballSpeed);
+		
+		Vector2 interceptionPosition = ballPosition.add(new Vector2(ballMovementDirection.x * distanceBallTravelsToPassPlayer, ballMovementDirection.y * distanceBallTravelsToPassPlayer)); 
+		
+		
+		
+		float a = ballSpeerSqr - playerSpeerSqr;
+		
+		float b = -2.0f * (ballSpeerSqr * timeUntilBallPassesPlayer + playerSpeed);
+		
+		float c = ballSpeerSqr * timeUntilBallPassesPlayer * timeUntilBallPassesPlayer + 
+                distanceFromPlayerToBallAtInterception * distanceFromPlayerToBallAtInterception;
+		
+		float disc = (float) Math.pow(b, 2) - 4 * a * c;
+
+		Gdx.app.debug("Disc", "Disc" + disc);
+		
+		float t1 = (float) (-b + Math.pow(disc, 0.5)) / (2 * a);
+		float t2 = (float) (-b - Math.pow(disc, 0.5)) / (2 * a);
+
+		float t = 0;
+
+		if (t1 < t2 && t1 > 0) {
+			t = t1;
+		} else if (t2 < t1 && t2 > 0) {
+			t = t2;
+		}
+
+		float aimX = (t * ball.body.getLinearVelocity().x)
+				+ ball.body.getWorldCenter().x;
+		float aimY = (t * ball.body.getLinearVelocity().y)
+				+ ball.body.getWorldCenter().y;
+		
+		Vector2 interceptionPos = new Vector2(aimX, aimY);
+		
+		Vector2 interceptDirection =  getNormailesedMovementDirection(playerPosition, interceptionPos);
+		
+		closestAwayPlayer.body.setLinearVelocity(new Vector2(interceptDirection.x * Player.PLAYER_SPEED, interceptDirection.y * Player.PLAYER_SPEED));
+		
+		
+		
+		
+	}
+	
+	public Vector2 getNormailesedMovementDirection(Vector2 playerLocation, Vector2 interceptionPosition) {
+
+		Vector2 temp = new Vector2(interceptionPosition.x - playerLocation.x, (interceptionPosition.y - playerLocation.y));
+
+		int direcitonX = 1;
+		int directionY = 1;
+
+		if(temp.x < 1)
+		{
+			direcitonX = -1;
+		}
+
+		if(temp.y < 1)
+		{
+			directionY = -1;
+		}
+
+		float absX = Math.abs(temp.x);
+		float absY = Math.abs(temp.y);
+
+		if(absX > absY)
+		{
+			temp.x = direcitonX * 1;
+			temp.y = directionY * (absY/absX);
+		}
+		else
+		{
+
+			temp.y = directionY * 1;
+			temp.x = direcitonX * (absX/absY);				
+
+		}
+		return temp;
+
 	}
 
 	public void moveCamera(float x, float y) {

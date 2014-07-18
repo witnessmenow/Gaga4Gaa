@@ -3,10 +3,10 @@ package com.ladinc.gaga.core;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.ladinc.gaga.controls.SimpleDirectionGestureDetector;
-import com.ladinc.gaga.screens.GameScreen;
+import com.ladinc.gaga.core.controls.SimpleDirectionGestureDetector;
+import com.ladinc.gaga.core.screens.GameScreen;
 
-public class Gaga extends Game {
+public class GaGa extends Game {
 	public static float delta;
 
 	private GameScreen gameScreen;
@@ -52,3 +52,4 @@ public class Gaga extends Game {
 		this.gameScreen = new GameScreen(this);
 	}
 }
+

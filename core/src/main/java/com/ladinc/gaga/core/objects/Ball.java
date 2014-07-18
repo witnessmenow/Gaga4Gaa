@@ -13,7 +13,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.ladinc.gaga.core.collision.CollisionInfo;
 import com.ladinc.gaga.core.collision.CollisionInfo.CollisionObjectType;
 import com.ladinc.gaga.core.objects.BoxProp.Line;
-import com.ladinc.gaga.screens.GameScreen;
+import com.ladinc.gaga.core.screens.GameScreen;
 
 public class Ball {
 	public Body body;

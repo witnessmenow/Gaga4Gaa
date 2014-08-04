@@ -1,5 +1,6 @@
 package com.ladinc.gaga.core.collision;
 
+
 public class CollisionInfo {
 
 	public String text;
@@ -13,13 +14,6 @@ public class CollisionInfo {
 		this.type = type;
 	}
 
-	// public CollisionInfo(String text, CollisionObjectType type, Object side)
-	// {
-	// this.text = text;
-	// this.type = type;
-	// this.team = side;
-	// }
-
 	public CollisionInfo(String text, CollisionObjectType type, Object object) {
 		this.text = text;
 		this.type = type;
@@ -27,7 +21,7 @@ public class CollisionInfo {
 	}
 
 	public static enum CollisionObjectType {
-		Wall, Player, VehicleSensor, ScoreZone, Ball, Pocket, BallSensor, FloorSensor, AIPLayer
+		Wall, UserPlayer, AIPlayer, Ball
 	};
 
 }

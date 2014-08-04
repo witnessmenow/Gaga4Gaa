@@ -3,10 +3,10 @@ package com.ladinc.gaga.core.objects;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.ladinc.gaga.core.collision.CollisionInfo;
 import com.ladinc.gaga.core.collision.CollisionInfo.CollisionObjectType;
 
@@ -54,6 +54,6 @@ public class UserPlayer extends Player {
 		this.body.createFixture(fixtureDef);
 
 		this.body.setUserData(new CollisionInfo("player",
-				CollisionObjectType.Player, this));
+				CollisionObjectType.UserPlayer, this));
 	}
 }

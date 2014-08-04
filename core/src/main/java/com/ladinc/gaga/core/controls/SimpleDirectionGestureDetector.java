@@ -28,20 +28,7 @@ public class SimpleDirectionGestureDetector extends GestureDetector {
 
 		@Override
 		public boolean fling(float velocityX, float velocityY, int button) {
-			if (GameScreen.attacking) {
-				if (Math.abs(velocityX) > Math.abs(velocityY)) {
-					if (velocityX > 0) {
-						directionListener.onRight();
-					} else {
-						directionListener.onLeft();
-					}
-				} else {
-					if (velocityY > 0) {
-						directionListener.onDown();
-					} else {
-						directionListener.onUp();
-					}
-				}
+			if (GameScreen.attacking && GameScreen.ballAtFeet) {
 
 				GameScreen
 						.moveBall(new Vector2(velocityX * 10, -velocityY * 10));

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -26,6 +28,8 @@ import com.ladinc.gaga.core.objects.Player;
 import com.ladinc.gaga.core.objects.UserPlayer;
 
 public class GameScreen implements Screen {
+	private static final String AI_PLAYER = "AI_PLAYER";
+	private static final String GRASS = "GRASS";
 	private static final String BALL = "BALL";
 	public static float AI_CREATION_RATE = 1;
 	private final Box2DDebugRenderer debugRenderer;
@@ -48,6 +52,7 @@ public class GameScreen implements Screen {
 	private World world;
 
 	public static Map<String, Sprite> textureMap = new HashMap<String, Sprite>();
+	public static Map<Integer, Sprite> awayTeamTextureMap = new HashMap<Integer, Sprite>();
 
 	Map<Integer, Vector2> positionVectorMap = new HashMap<Integer, Vector2>();
 
@@ -56,6 +61,16 @@ public class GameScreen implements Screen {
 	public static Map<Integer, Vector2> attackingPositionsMap = new HashMap<Integer, Vector2>();
 
 	private Texture ballTexture;
+	private Texture grassTexture;
+
+	private Texture aiPlayerTexture0;
+	private Texture aiPlayerTexture1;
+	private Texture aiPlayerTexture2;
+	private Texture aiPlayerTexture3;
+	private Texture aiPlayerTexture4;
+	private Texture aiPlayerTexture5;
+	private Texture aiPlayerTexture6;
+
 	public static Ball ball;
 	public static Map<Integer, UserPlayer> homeTeamPlayerMap = new HashMap<Integer, UserPlayer>();
 
@@ -80,7 +95,7 @@ public class GameScreen implements Screen {
 
 		spriteBatch = new SpriteBatch();
 
-		setUpTextureMap();
+		setUpTextureMaps();
 
 		this.debugRenderer = new Box2DDebugRenderer();
 	}
@@ -93,9 +108,34 @@ public class GameScreen implements Screen {
 		}
 	}
 
-	private void setUpTextureMap() {
+	private void setUpTextureMaps() {
 		ballTexture = new Texture(Gdx.files.internal("ball.png"));
 		textureMap.put(BALL, new Sprite(ballTexture));
+
+		grassTexture = new Texture(Gdx.files.internal("grassMowed.png"));
+		textureMap.put(GRASS, new Sprite(grassTexture));
+
+		aiPlayerTexture0 = new Texture(Gdx.files.internal("playerRed0.png"));
+		awayTeamTextureMap.put(0, new Sprite(aiPlayerTexture0));
+
+		aiPlayerTexture1 = new Texture(Gdx.files.internal("playerRed1.png"));
+		awayTeamTextureMap.put(1, new Sprite(aiPlayerTexture1));
+
+		aiPlayerTexture2 = new Texture(Gdx.files.internal("playerRed2.png"));
+		awayTeamTextureMap.put(2, new Sprite(aiPlayerTexture2));
+
+		aiPlayerTexture3 = new Texture(Gdx.files.internal("playerRed3.png"));
+		awayTeamTextureMap.put(3, new Sprite(aiPlayerTexture3));
+
+		aiPlayerTexture4 = new Texture(Gdx.files.internal("playerRed4.png"));
+		awayTeamTextureMap.put(4, new Sprite(aiPlayerTexture4));
+
+		aiPlayerTexture5 = new Texture(Gdx.files.internal("playerRed5.png"));
+		awayTeamTextureMap.put(5, new Sprite(aiPlayerTexture5));
+
+		aiPlayerTexture6 = new Texture(Gdx.files.internal("playerRed6.png"));
+		awayTeamTextureMap.put(6, new Sprite(aiPlayerTexture6));
+
 	}
 
 	public static void setSpritePosition(Sprite sprite, int PIXELS_PER_METER,
@@ -131,8 +171,13 @@ public class GameScreen implements Screen {
 
 		this.spriteBatch.begin();
 
-		// updateSprite(textureMap.get(BALL), this.spriteBatch,
-		// PIXELS_PER_METER, ball.body);
+		// spriteBatch.draw(textureMap.get(BALL), 400, 800);
+
+		addAwayTeamSprites();
+
+		updateSprite(textureMap.get(BALL), this.spriteBatch, PIXELS_PER_METER,
+				ball.body);
+
 		updateUserPlayerPositions(new ArrayList<Player>(
 				homeTeamPlayerMap.values()));
 
@@ -143,6 +188,18 @@ public class GameScreen implements Screen {
 
 		debugRenderer.render(world, camera.combined.scale(PIXELS_PER_METER,
 				PIXELS_PER_METER, PIXELS_PER_METER));
+	}
+
+	private void addAwayTeamSprites() {
+		for (Entry<Integer, AIPlayer> aiPlayer : awayTeamPlayerMap.entrySet()) {
+			// random number between 0 and 6
+			int Low = 0;
+			int High = 6;
+			Random r = new Random();
+			int rand = r.nextInt(High - Low) + Low;
+			updateSprite(awayTeamTextureMap.get(rand), this.spriteBatch,
+					PIXELS_PER_METER, aiPlayer.getValue().body);
+		}
 	}
 
 	private void updateAIPlayerPositions() {
@@ -174,104 +231,120 @@ public class GameScreen implements Screen {
 						(Player.PLAYER_SPEED * aiPLayerToBallVector.y));
 
 			} else {
-//				// Using formulae from
-//				// http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
-//
-//				float xCompSq = ball.body.getLinearVelocity().x
-//						* ball.body.getLinearVelocity().x;
-//				float yCompSq = ball.body.getLinearVelocity().y
-//						* ball.body.getLinearVelocity().y;
-//
-//				//float ballSpeed = (float) Math.pow((xCompSq + yCompSq), 0.5);
-//				
-//				float ballSpeedSq = UserPlayer.PLAYER_SPEED * UserPlayer.PLAYER_SPEED;
-//
-//				float a = (float) (xCompSq + yCompSq - ballSpeedSq);
-//				
-//				Gdx.app.debug("Disc", "a" + a);
-//
-//				float b = 2  
-//						*
-//						(ball.body.getLinearVelocity().x * (ball.body.getWorldCenter().x - closestAwayPlayer.body.getWorldCenter().x)
-//						+
-//						ball.body.getLinearVelocity().y * (ball.body.getWorldCenter().y - closestAwayPlayer.body.getWorldCenter().y));
-//
-//				Gdx.app.debug("Disc", "b" + b);
-//				
-//				float c = (float) ((Math.pow((ball.body.getWorldCenter().x - closestAwayPlayer.body.getWorldCenter().x), 2))
-//								+
-//								(Math.pow((ball.body.getWorldCenter().y - closestAwayPlayer.body.getWorldCenter().y), 2)));
-//
-//				
-//				Gdx.app.debug("Disc", "c" + c);
-//
-//				float disc = (float) Math.pow(b, 2) - 4 * a * c;
-//
-//				Gdx.app.debug("Disc", "Disc" + disc);
-//				
-//				float t1 = (float) (-b + Math.pow(disc, 0.5)) / (2 * a);
-//				float t2 = (float) (-b - Math.pow(disc, 0.5)) / (2 * a);
-//
-//				float t = 0;
-//
-//				if (t1 < t2 && t1 > 0) {
-//					t = t1;
-//				} else if (t2 < t1 && t2 > 0) {
-//					t = t2;
-//				}
-//
-//				float aimX = (t * ball.body.getLinearVelocity().x)
-//						+ ball.body.getWorldCenter().x;
-//				float aimY = (t * ball.body.getLinearVelocity().y)
-//						+ ball.body.getWorldCenter().y;
-//
-//				Vector2 aiPlayerMovement = new Vector2(aimX, aimY);
-//				closestAwayPlayer.body.setLinearVelocity(aiPlayerMovement);
-				
+				// // Using formulae from
+				// //
+				// http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
+				//
+				// float xCompSq = ball.body.getLinearVelocity().x
+				// * ball.body.getLinearVelocity().x;
+				// float yCompSq = ball.body.getLinearVelocity().y
+				// * ball.body.getLinearVelocity().y;
+				//
+				// //float ballSpeed = (float) Math.pow((xCompSq + yCompSq),
+				// 0.5);
+				//
+				// float ballSpeedSq = UserPlayer.PLAYER_SPEED *
+				// UserPlayer.PLAYER_SPEED;
+				//
+				// float a = (float) (xCompSq + yCompSq - ballSpeedSq);
+				//
+				// Gdx.app.debug("Disc", "a" + a);
+				//
+				// float b = 2
+				// *
+				// (ball.body.getLinearVelocity().x *
+				// (ball.body.getWorldCenter().x -
+				// closestAwayPlayer.body.getWorldCenter().x)
+				// +
+				// ball.body.getLinearVelocity().y *
+				// (ball.body.getWorldCenter().y -
+				// closestAwayPlayer.body.getWorldCenter().y));
+				//
+				// Gdx.app.debug("Disc", "b" + b);
+				//
+				// float c = (float) ((Math.pow((ball.body.getWorldCenter().x -
+				// closestAwayPlayer.body.getWorldCenter().x), 2))
+				// +
+				// (Math.pow((ball.body.getWorldCenter().y -
+				// closestAwayPlayer.body.getWorldCenter().y), 2)));
+				//
+				//
+				// Gdx.app.debug("Disc", "c" + c);
+				//
+				// float disc = (float) Math.pow(b, 2) - 4 * a * c;
+				//
+				// Gdx.app.debug("Disc", "Disc" + disc);
+				//
+				// float t1 = (float) (-b + Math.pow(disc, 0.5)) / (2 * a);
+				// float t2 = (float) (-b - Math.pow(disc, 0.5)) / (2 * a);
+				//
+				// float t = 0;
+				//
+				// if (t1 < t2 && t1 > 0) {
+				// t = t1;
+				// } else if (t2 < t1 && t2 > 0) {
+				// t = t2;
+				// }
+				//
+				// float aimX = (t * ball.body.getLinearVelocity().x)
+				// + ball.body.getWorldCenter().x;
+				// float aimY = (t * ball.body.getLinearVelocity().y)
+				// + ball.body.getWorldCenter().y;
+				//
+				// Vector2 aiPlayerMovement = new Vector2(aimX, aimY);
+				// closestAwayPlayer.body.setLinearVelocity(aiPlayerMovement);
+
 				setPlayerMovement(closestAwayPlayer);
 			}
 		} else { // defending, but AITeam are attacking
 		}
 	}
-	
-	//adapted from here
-	//http://www.box2d.org/forum/viewtopic.php?f=3&t=8833
-	
-	public void setPlayerMovement(Player closestAwayPlayer)
-	{
+
+	// adapted from here
+	// http://www.box2d.org/forum/viewtopic.php?f=3&t=8833
+
+	public void setPlayerMovement(Player closestAwayPlayer) {
 		Vector2 ballPosition = this.ball.body.getWorldCenter();
 		Vector2 playerPosition = closestAwayPlayer.body.getWorldCenter();
-		
+
 		Vector2 ballMovementDirection = this.ball.body.getLinearVelocity();
-		
+
 		float ballSpeed = this.ball.body.getLinearVelocity().len();
-		float playerSpeed = new Vector2(Player.PLAYER_SPEED, Player.PLAYER_SPEED).len();
-		
-		Vector2 offsetToBall = new Vector2(ballPosition.x - playerPosition.x, ballPosition.y - playerPosition.y);
-		
-		float distanceFromPlayerToBallAtInterception = Math.abs(ballMovementDirection.crs(offsetToBall));
-		float distanceBallTravelsToPassPlayer  = - ballMovementDirection.dot(offsetToBall);
-		
+		float playerSpeed = new Vector2(Player.PLAYER_SPEED,
+				Player.PLAYER_SPEED).len();
+
+		Vector2 offsetToBall = new Vector2(ballPosition.x - playerPosition.x,
+				ballPosition.y - playerPosition.y);
+
+		float distanceFromPlayerToBallAtInterception = Math
+				.abs(ballMovementDirection.crs(offsetToBall));
+		float distanceBallTravelsToPassPlayer = -ballMovementDirection
+				.dot(offsetToBall);
+
 		float ballSpeerSqr = (float) Math.pow(ballSpeed, 2);
 		float playerSpeerSqr = (float) Math.pow(playerSpeed, 2);
-		
-		float timeUntilBallPassesPlayer = (float) (ballSpeed == 0.0f ? 0.0f : distanceBallTravelsToPassPlayer / ballSpeed);
-		
-		Vector2 interceptionPosition = ballPosition.add(new Vector2(ballMovementDirection.x * distanceBallTravelsToPassPlayer, ballMovementDirection.y * distanceBallTravelsToPassPlayer)); 
-		
-		
-		
+
+		float timeUntilBallPassesPlayer = ballSpeed == 0.0f ? 0.0f
+				: distanceBallTravelsToPassPlayer / ballSpeed;
+
+		Vector2 interceptionPosition = ballPosition.add(new Vector2(
+				ballMovementDirection.x * distanceBallTravelsToPassPlayer,
+				ballMovementDirection.y * distanceBallTravelsToPassPlayer));
+
 		float a = ballSpeerSqr - playerSpeerSqr;
-		
-		float b = -2.0f * (ballSpeerSqr * timeUntilBallPassesPlayer + playerSpeed);
-		
-		float c = ballSpeerSqr * timeUntilBallPassesPlayer * timeUntilBallPassesPlayer + 
-                distanceFromPlayerToBallAtInterception * distanceFromPlayerToBallAtInterception;
-		
+
+		float b = -2.0f
+				* (ballSpeerSqr * timeUntilBallPassesPlayer + playerSpeed);
+
+		float c = ballSpeerSqr * timeUntilBallPassesPlayer
+				* timeUntilBallPassesPlayer
+				+ distanceFromPlayerToBallAtInterception
+				* distanceFromPlayerToBallAtInterception;
+
 		float disc = (float) Math.pow(b, 2) - 4 * a * c;
 
 		Gdx.app.debug("Disc", "Disc" + disc);
-		
+
 		float t1 = (float) (-b + Math.pow(disc, 0.5)) / (2 * a);
 		float t2 = (float) (-b - Math.pow(disc, 0.5)) / (2 * a);
 
@@ -287,48 +360,45 @@ public class GameScreen implements Screen {
 				+ ball.body.getWorldCenter().x;
 		float aimY = (t * ball.body.getLinearVelocity().y)
 				+ ball.body.getWorldCenter().y;
-		
-		Vector2 interceptionPos = new Vector2(aimX, aimY);
-		
-		Vector2 interceptDirection =  getNormailesedMovementDirection(playerPosition, interceptionPos);
-		
-		closestAwayPlayer.body.setLinearVelocity(new Vector2(interceptDirection.x * Player.PLAYER_SPEED, interceptDirection.y * Player.PLAYER_SPEED));
-		
-		
-		
-		
-	}
-	
-	public Vector2 getNormailesedMovementDirection(Vector2 playerLocation, Vector2 interceptionPosition) {
 
-		Vector2 temp = new Vector2(interceptionPosition.x - playerLocation.x, (interceptionPosition.y - playerLocation.y));
+		Vector2 interceptionPos = new Vector2(aimX, aimY);
+
+		Vector2 interceptDirection = getNormailesedMovementDirection(
+				playerPosition, interceptionPos);
+
+		closestAwayPlayer.body.setLinearVelocity(new Vector2(
+				interceptDirection.x * Player.PLAYER_SPEED,
+				interceptDirection.y * Player.PLAYER_SPEED));
+
+	}
+
+	public Vector2 getNormailesedMovementDirection(Vector2 playerLocation,
+			Vector2 interceptionPosition) {
+
+		Vector2 temp = new Vector2(interceptionPosition.x - playerLocation.x,
+				(interceptionPosition.y - playerLocation.y));
 
 		int direcitonX = 1;
 		int directionY = 1;
 
-		if(temp.x < 1)
-		{
+		if (temp.x < 1) {
 			direcitonX = -1;
 		}
 
-		if(temp.y < 1)
-		{
+		if (temp.y < 1) {
 			directionY = -1;
 		}
 
 		float absX = Math.abs(temp.x);
 		float absY = Math.abs(temp.y);
 
-		if(absX > absY)
-		{
+		if (absX > absY) {
 			temp.x = direcitonX * 1;
-			temp.y = directionY * (absY/absX);
-		}
-		else
-		{
+			temp.y = directionY * (absY / absX);
+		} else {
 
 			temp.y = directionY * 1;
-			temp.x = direcitonX * (absX/absY);				
+			temp.x = direcitonX * (absX / absY);
 
 		}
 		return temp;
@@ -677,7 +747,7 @@ public class GameScreen implements Screen {
 	}
 
 	private void addBall() {
-		ball = new Ball(world, 30, 30, new Sprite(textureMap.get(BALL)));
+		ball = new Ball(world, 30, 30);
 	}
 
 	// add walls, length of the pitch is 1.5 times screen height

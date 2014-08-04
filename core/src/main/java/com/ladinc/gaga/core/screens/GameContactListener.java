@@ -1,6 +1,7 @@
 package com.ladinc.gaga.core.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
@@ -9,8 +10,10 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.ladinc.gaga.core.collision.CollisionInfo;
 import com.ladinc.gaga.core.collision.CollisionInfo.CollisionObjectType;
+import com.ladinc.gaga.core.objects.AIPlayer;
 import com.ladinc.gaga.core.objects.Ball;
 import com.ladinc.gaga.core.objects.BoxProp;
+import com.ladinc.gaga.core.objects.Player;
 import com.ladinc.gaga.core.objects.UserPlayer;
 
 public class GameContactListener implements ContactListener {
@@ -25,7 +28,7 @@ public class GameContactListener implements ContactListener {
 		CollisionInfo bodyBInfo = getCollisionInfoFromFixture(fixtureB);
 
 		Ball ball;
-		UserPlayer player;
+		Player player;
 		BoxProp wall;
 
 		if (bodyAInfo != null && bodyBInfo != null) {
@@ -35,7 +38,7 @@ public class GameContactListener implements ContactListener {
 							+ bodyBInfo.type.toString());
 
 			if (GameContactListener.checkIfCollisionIsOfCertainBodies(
-					bodyAInfo, bodyBInfo, CollisionObjectType.Player,
+					bodyAInfo, bodyBInfo, CollisionObjectType.UserPlayer,
 					CollisionObjectType.Ball)) {
 				if (bodyAInfo.type == CollisionObjectType.Ball) {
 					ball = (Ball) bodyAInfo.object;
@@ -46,6 +49,25 @@ public class GameContactListener implements ContactListener {
 				}
 
 				ball.playerHasBall(player);
+				GameScreen.ballAtFeet = true;
+				GameScreen.ball.body.setLinearVelocity(new Vector2(0, 0));
+
+				Gdx.app.log("beginContact", "player got ball");
+
+			} else if (GameContactListener.checkIfCollisionIsOfCertainBodies(
+					bodyAInfo, bodyBInfo, CollisionObjectType.AIPlayer,
+					CollisionObjectType.Ball)) {
+				if (bodyAInfo.type == CollisionObjectType.Ball) {
+					ball = (Ball) bodyAInfo.object;
+					player = (AIPlayer) bodyBInfo.object;
+				} else {
+					ball = (Ball) bodyBInfo.object;
+					player = (AIPlayer) bodyAInfo.object;
+				}
+
+				ball.playerHasBall(player);
+				GameScreen.ballAtFeet = true;
+				GameScreen.ball.body.setLinearVelocity(new Vector2(0, 0));
 
 				Gdx.app.log("beginContact", "player got ball");
 
@@ -108,7 +130,7 @@ public class GameContactListener implements ContactListener {
 					+ " and " + bodyBInfo.type.toString());
 
 			if (GameContactListener.checkIfCollisionIsOfCertainBodies(
-					bodyAInfo, bodyBInfo, CollisionObjectType.Player,
+					bodyAInfo, bodyBInfo, CollisionObjectType.UserPlayer,
 					CollisionObjectType.Ball)) {
 
 				GameScreen.ballAtFeet = false;

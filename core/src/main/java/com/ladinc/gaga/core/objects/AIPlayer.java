@@ -53,7 +53,7 @@ public class AIPlayer extends Player {
 		this.body.createFixture(fixtureDef);
 
 		this.body.setUserData(new CollisionInfo("aiplayer",
-				CollisionObjectType.AIPLayer, this));
+				CollisionObjectType.AIPlayer, this));
 	}
 
 }

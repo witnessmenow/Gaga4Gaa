@@ -1,7 +1,6 @@
 package com.ladinc.gaga.core.objects;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -22,7 +21,6 @@ public class Ball {
 	protected float slowDownMultiplier = 0.75f;
 	protected float linDamp = 1f;
 	public static final float ballOffsetX = 0f;
-	public Sprite sprite;
 
 	private double ballHeight = 0f;
 
@@ -34,30 +32,11 @@ public class Ball {
 		this.ballHeight = ballHeight;
 	}
 
-	public Ball(World world, float x, float y, Sprite ballSprite, float ballSize) {
-		this.ballSize = ballSize;
-		createBallObject(world, x, y, ballSprite, false);
+	public Ball(World world, float x, float y) {
+		createBallObject(world, x, y, false);
 	}
 
-	public Ball(World world, float x, float y, Sprite ballSprite,
-			float ballSize, float density, float linDamp) {
-		this.density = density;
-		this.ballSize = ballSize;
-		this.linDamp = linDamp;
-		createBallObject(world, x, y, ballSprite, false);
-	}
-
-	public Ball(World world, float x, float y, Sprite ballSprite) {
-		createBallObject(world, x, y, ballSprite, false);
-	}
-
-	public Ball(World world, float x, float y, Sprite ballSprite,
-			boolean networked) {
-
-		createBallObject(world, x, y, ballSprite, networked);
-	}
-
-	public void playerHasBall(UserPlayer player) {
+	public void playerHasBall(Player player) {
 		this.body.setLinearVelocity(new Vector2(0, 0));
 
 		// attacking will be set to true unless the ball touches an
@@ -77,7 +56,7 @@ public class Ball {
 	}
 
 	protected void createBallObject(World world, float x, float y,
-			Sprite ballSprite, boolean networked) {
+			boolean networked) {
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.position.set(x, y);
@@ -96,7 +75,6 @@ public class Ball {
 		fixtureDef.isSensor = true;
 
 		this.body.createFixture(fixtureDef);
-		this.sprite = ballSprite;
 
 		this.body.setUserData(new CollisionInfo("ball",
 				CollisionObjectType.Ball, this));

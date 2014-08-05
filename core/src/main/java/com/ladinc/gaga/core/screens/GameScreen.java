@@ -472,6 +472,7 @@ public class GameScreen implements Screen {
 
 		this.spriteBatch.begin();
 
+		this.spriteBatch.draw(this.textureMap.get(GRASS), 35, 35, 1860, 1760);
 		updateSprite(textureMap.get(BALL), this.spriteBatch, PIXELS_PER_METER,
 				ball.body);
 

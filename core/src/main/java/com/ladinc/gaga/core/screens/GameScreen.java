@@ -632,22 +632,28 @@ public class GameScreen implements Screen {
 		homePlayerTexture7 = new Texture(Gdx.files.internal("playerRed7.png"));
 		homeTeamTextureMap.put(7, new Sprite(homePlayerTexture7));
 
-		homePlayerTexture1 = new Texture(Gdx.files.internal("playerRed1.png"));
+		homePlayerTexture1 = new Texture(
+				Gdx.files.internal("playerBlueShirt1.png"));
 		homeTeamTextureMap.put(1, new Sprite(homePlayerTexture1));
 
-		homePlayerTexture2 = new Texture(Gdx.files.internal("playerRed2.png"));
+		homePlayerTexture2 = new Texture(
+				Gdx.files.internal("playerBlueShirt2.png"));
 		homeTeamTextureMap.put(2, new Sprite(homePlayerTexture2));
 
-		homePlayerTexture3 = new Texture(Gdx.files.internal("playerRed3.png"));
+		homePlayerTexture3 = new Texture(
+				Gdx.files.internal("playerBlueShirt3.png"));
 		homeTeamTextureMap.put(3, new Sprite(homePlayerTexture3));
 
-		homePlayerTexture4 = new Texture(Gdx.files.internal("playerRed4.png"));
+		homePlayerTexture4 = new Texture(
+				Gdx.files.internal("playerBlueShirt4.png"));
 		homeTeamTextureMap.put(4, new Sprite(homePlayerTexture4));
 
-		homePlayerTexture5 = new Texture(Gdx.files.internal("playerRed5.png"));
+		homePlayerTexture5 = new Texture(
+				Gdx.files.internal("playerBlueShirt5.png"));
 		homeTeamTextureMap.put(5, new Sprite(homePlayerTexture5));
 
-		homePlayerTexture6 = new Texture(Gdx.files.internal("playerRed6.png"));
+		homePlayerTexture6 = new Texture(
+				Gdx.files.internal("playerBlueShirt6.png"));
 		homeTeamTextureMap.put(6, new Sprite(homePlayerTexture6));
 	}
 

@@ -56,33 +56,21 @@ public class GameContactListener implements ContactListener {
 
 			if (GameContactListener.checkIfCollisionIsOfCertainBodies(
 					bodyAInfo, bodyBInfo, CollisionObjectType.UserPlayer,
-					CollisionObjectType.Ball)) {
+					CollisionObjectType.Ball)
+					|| GameContactListener.checkIfCollisionIsOfCertainBodies(
+							bodyAInfo, bodyBInfo, CollisionObjectType.AIPlayer,
+							CollisionObjectType.Ball)) {
 				if (bodyAInfo.type == CollisionObjectType.Ball) {
 					ball = (Ball) bodyAInfo.object;
-					player = (UserPlayer) bodyBInfo.object;
+					setAttackingOrDefending(bodyBInfo);
+					player = (Player) bodyBInfo.object;
 				} else {
 					ball = (Ball) bodyBInfo.object;
-					player = (UserPlayer) bodyAInfo.object;
+					setAttackingOrDefending(bodyAInfo);
+					player = (Player) bodyAInfo.object;
 				}
 
-				ball.playerHasBall(player);
-				GameScreen.ballAtFeet = true;
-				GameScreen.ball.body.setLinearVelocity(new Vector2(0, 0));
-
-				Gdx.app.log("beginContact", "player got ball");
-
-			} else if (GameContactListener.checkIfCollisionIsOfCertainBodies(
-					bodyAInfo, bodyBInfo, CollisionObjectType.AIPlayer,
-					CollisionObjectType.Ball)) {
-				if (bodyAInfo.type == CollisionObjectType.Ball) {
-					ball = (Ball) bodyAInfo.object;
-					player = (AIPlayer) bodyBInfo.object;
-				} else {
-					ball = (Ball) bodyBInfo.object;
-					player = (AIPlayer) bodyAInfo.object;
-				}
-
-				ball.playerHasBall(player);
+				player.setHasBall(true);
 				GameScreen.ballAtFeet = true;
 				GameScreen.ball.body.setLinearVelocity(new Vector2(0, 0));
 
@@ -118,26 +106,19 @@ public class GameContactListener implements ContactListener {
 		CollisionInfo bodyAInfo = getCollisionInfoFromFixture(fixtureA);
 		CollisionInfo bodyBInfo = getCollisionInfoFromFixture(fixtureB);
 
-		Ball ball;
-		UserPlayer player;
-
 		if (bodyAInfo != null && bodyBInfo != null) {
 
 			Gdx.app.debug("endContact", "between " + bodyAInfo.type.toString()
 					+ " and " + bodyBInfo.type.toString());
 
-			if (GameContactListener.checkIfCollisionIsOfCertainBodies(
-					bodyAInfo, bodyBInfo, CollisionObjectType.UserPlayer,
-					CollisionObjectType.Ball)) {
+			if (checkIfCollisionIsOfCertainBodies(bodyAInfo, bodyBInfo,
+					CollisionObjectType.UserPlayer, CollisionObjectType.Ball)
+					|| GameContactListener.checkIfCollisionIsOfCertainBodies(
+							bodyAInfo, bodyBInfo, CollisionObjectType.AIPlayer,
+							CollisionObjectType.Ball)) {
 
-				GameScreen.ballAtFeet = false;
-				Gdx.app.log("endContact", "user player kicked ball");
-			} else if (GameContactListener.checkIfCollisionIsOfCertainBodies(
-					bodyAInfo, bodyBInfo, CollisionObjectType.AIPlayer,
-					CollisionObjectType.Ball)) {
-
-				GameScreen.ballAtFeet = false;
-				Gdx.app.log("endContact", "ai player kicked ball");
+				setHasBallAtFeetFalse(bodyAInfo, bodyBInfo);
+				Gdx.app.log("endContact", "player kicked ball");
 			}
 		}
 
@@ -177,6 +158,27 @@ public class GameContactListener implements ContactListener {
 	public void preSolve(Contact contact, Manifold oldManifold) {
 		// TODO Auto-generated method stub
 
+	}
+
+	private void setAttackingOrDefending(CollisionInfo bodyBInfo) {
+		if (bodyBInfo.object.getClass() == UserPlayer.class)
+			GameScreen.attacking = true;
+		else if (bodyBInfo.object.getClass() == AIPlayer.class) {
+			GameScreen.attacking = false;
+		}
+	}
+
+	private void setHasBallAtFeetFalse(CollisionInfo bodyAInfo,
+			CollisionInfo bodyBInfo) {
+		if (bodyAInfo.object.getClass() == UserPlayer.class
+				|| bodyAInfo.object.getClass() == AIPlayer.class) {
+			Player player = (Player) bodyAInfo.object;
+			player.setHasBall(false);
+		} else if (bodyBInfo.object.getClass() == UserPlayer.class
+				|| bodyBInfo.object.getClass() == AIPlayer.class) {
+			Player player = (Player) bodyAInfo.object;
+			player.setHasBall(false);
+		}
 	}
 
 }

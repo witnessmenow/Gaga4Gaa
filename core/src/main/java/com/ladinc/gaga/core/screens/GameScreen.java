@@ -379,7 +379,9 @@ public class GameScreen implements Screen {
 			boolean attacking) {
 		Vector2 movement;
 
-		if (attacking) {
+		if (player.getHasBall()) {
+			movement = new Vector2(0, 0);
+		} else if (attacking && !player.getHasBall()) {
 			movement = player.getMovemenOfPlayerTowardsTargetDest(player.body
 					.getPosition(),
 					player.isClosestPlayerToBall() ? ball.getPosition()
@@ -749,7 +751,7 @@ public class GameScreen implements Screen {
 				linearVel = getAttackOrDefendingMovement(player, true);
 			} else {
 
-				// pass in either the ball of the player target defending
+				// pass in either the ball or the player target defending
 				// position, based on the 'isClosestToBall' boolean
 				linearVel = getAttackOrDefendingMovement(player, false);
 			}

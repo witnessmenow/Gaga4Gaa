@@ -34,21 +34,23 @@ public class GameScreen implements Screen {
 	public static Map<Integer, Sprite> awayTeamTextureMap = new HashMap<Integer, Sprite>();
 	public static Ball ball;
 	private static final String BALL = "BALL";
-
 	public static boolean ballAtFeet;
+
+	private static final String BTM_GOAL = "BTM_GOAL";
 
 	public static Vector2 center = new Vector2();
 	// these maps will use the same key as the positionVectorMap
 	public static Map<Integer, Vector2> defendingPositionsMap = new HashMap<Integer, Vector2>();
 	private static final String GRASS = "GRASS";
-
 	public static Map<Integer, UserPlayer> homeTeamPlayerMap = new HashMap<Integer, UserPlayer>();
+
 	public static Map<Integer, Sprite> homeTeamTextureMap = new HashMap<Integer, Sprite>();
-
 	private static int PIXELS_PER_METER = 10;
-	public static int screenHeight;
 
+	public static int screenHeight;
 	public static Map<String, Sprite> textureMap = new HashMap<String, Sprite>();
+
+	private static final String TOP_GOAL = "TOP_GOAL";
 
 	static void goalScored() {
 		System.out.println("Goal Scored");
@@ -87,20 +89,21 @@ public class GameScreen implements Screen {
 	private Texture aiPlayerTexture6;
 	private Texture aiPlayerTexture7;
 	private Texture ballTexture;
-	private final OrthographicCamera camera;
+	private Texture btmGoalTexture;
 
+	private final OrthographicCamera camera;
 	private GameContactListener contactListener;
+
 	private final Box2DDebugRenderer debugRenderer;
 
 	private final GaGa game;
-
 	private Texture grassTexture;
+
 	private Texture homePlayerTexture1;
 
 	private Texture homePlayerTexture2;
 
 	private Texture homePlayerTexture3;
-
 	private Texture homePlayerTexture4;
 	private Texture homePlayerTexture5;
 	private Texture homePlayerTexture6;
@@ -109,6 +112,7 @@ public class GameScreen implements Screen {
 	// Used for sprites etc
 	private final int screenWidth;
 	private final SpriteBatch spriteBatch;
+	private Texture topGoalTexture;
 	private World world;
 	private final float worldHeight;
 	// Used for Box2D
@@ -472,7 +476,10 @@ public class GameScreen implements Screen {
 
 		this.spriteBatch.begin();
 
-		this.spriteBatch.draw(this.textureMap.get(GRASS), 35, 35, 1860, 1760);
+		this.spriteBatch.draw(textureMap.get(GRASS), 35, 35, 1850, 1750);
+		this.spriteBatch.draw(textureMap.get(TOP_GOAL), 610, 1790, 750, 120);
+		this.spriteBatch.draw(textureMap.get(BTM_GOAL), 580, -70, 750, 110);
+
 		updateSprite(textureMap.get(BALL), this.spriteBatch, PIXELS_PER_METER,
 				ball.body);
 
@@ -656,6 +663,12 @@ public class GameScreen implements Screen {
 		homePlayerTexture6 = new Texture(
 				Gdx.files.internal("playerBlueShirt6.png"));
 		homeTeamTextureMap.put(6, new Sprite(homePlayerTexture6));
+
+		topGoalTexture = new Texture(Gdx.files.internal("top_goal.png"));
+		textureMap.put(TOP_GOAL, new Sprite(topGoalTexture));
+
+		btmGoalTexture = new Texture(Gdx.files.internal("btm_goal.png"));
+		textureMap.put(BTM_GOAL, new Sprite(btmGoalTexture));
 	}
 
 	@Override
@@ -684,92 +697,10 @@ public class GameScreen implements Screen {
 		setClosestPlayerToBall(listAwayPlayers);
 		Player closestAwayPlayer = getClosestPlayer(listAwayPlayers);
 
-		if (attacking) {
+		if (attacking) { // defending
 			if (ballAtFeet) {
-				// when defending, if the ball is at the attacker's players
-				// feet,
-				// the closest defender should go towards the ball
 
-				// if the ball is moving, a defender should move to intercept it
-				// TODO Which player should do this though??
-
-				// closest defender should move to the ball
-				Vector2 aiPLayerToBallVector = getAttackOrDefendingMovement(
-						closestAwayPlayer, false);
-
-				// TODO maybe have different values for Player.PLAYER_SPEED
-				// depending on the difficulty of the away team
-				closestAwayPlayer.body.setLinearVelocity(
-						(Player.PLAYER_SPEED * aiPLayerToBallVector.x),
-						(Player.PLAYER_SPEED * aiPLayerToBallVector.y));
-
-			} else {
-				// // Using formulae from
-				// //
-				// http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
-				//
-				// float xCompSq = ball.body.getLinearVelocity().x
-				// * ball.body.getLinearVelocity().x;
-				// float yCompSq = ball.body.getLinearVelocity().y
-				// * ball.body.getLinearVelocity().y;
-				//
-				// //float ballSpeed = (float) Math.pow((xCompSq + yCompSq),
-				// 0.5);
-				//
-				// float ballSpeedSq = UserPlayer.PLAYER_SPEED *
-				// UserPlayer.PLAYER_SPEED;
-				//
-				// float a = (float) (xCompSq + yCompSq - ballSpeedSq);
-				//
-				// Gdx.app.debug("Disc", "a" + a);
-				//
-				// float b = 2
-				// *
-				// (ball.body.getLinearVelocity().x *
-				// (ball.body.getWorldCenter().x -
-				// closestAwayPlayer.body.getWorldCenter().x)
-				// +
-				// ball.body.getLinearVelocity().y *
-				// (ball.body.getWorldCenter().y -
-				// closestAwayPlayer.body.getWorldCenter().y));
-				//
-				// Gdx.app.debug("Disc", "b" + b);
-				//
-				// float c = (float) ((Math.pow((ball.body.getWorldCenter().x -
-				// closestAwayPlayer.body.getWorldCenter().x), 2))
-				// +
-				// (Math.pow((ball.body.getWorldCenter().y -
-				// closestAwayPlayer.body.getWorldCenter().y), 2)));
-				//
-				//
-				// Gdx.app.debug("Disc", "c" + c);
-				//
-				// float disc = (float) Math.pow(b, 2) - 4 * a * c;
-				//
-				// Gdx.app.debug("Disc", "Disc" + disc);
-				//
-				// float t1 = (float) (-b + Math.pow(disc, 0.5)) / (2 * a);
-				// float t2 = (float) (-b - Math.pow(disc, 0.5)) / (2 * a);
-				//
-				// float t = 0;
-				//
-				// if (t1 < t2 && t1 > 0) {
-				// t = t1;
-				// } else if (t2 < t1 && t2 > 0) {
-				// t = t2;
-				// }
-				//
-				// float aimX = (t * ball.body.getLinearVelocity().x)
-				// + ball.body.getWorldCenter().x;
-				// float aimY = (t * ball.body.getLinearVelocity().y)
-				// + ball.body.getWorldCenter().y;
-				//
-				// Vector2 aiPlayerMovement = new Vector2(aimX, aimY);
-				// closestAwayPlayer.body.setLinearVelocity(aiPlayerMovement);
-
-				setPlayerMovement(closestAwayPlayer);
 			}
-		} else { // defending, but AITeam are attacking
 		}
 	}
 

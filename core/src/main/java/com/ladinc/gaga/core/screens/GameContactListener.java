@@ -18,6 +18,23 @@ import com.ladinc.gaga.core.objects.UserPlayer;
 
 public class GameContactListener implements ContactListener {
 
+	public static boolean checkIfCollisionIsOfCertainBodies(
+			CollisionInfo bodyAInfo, CollisionInfo bodyBInfo,
+			CollisionObjectType type1, CollisionObjectType type2) {
+		return (bodyAInfo.type == type1 && bodyBInfo.type == type2)
+				|| (bodyAInfo.type == type2 && bodyBInfo.type == type1);
+	}
+
+	// TODO Need to use collision detection instead of co-ordinates to check if
+	// ball is passing goalline
+	private boolean ballPassingGoalLine() {
+		boolean goalScored = false;
+		if (passGoalLineX() && passGoalLineY()) {
+			goalScored = true;
+		}
+		return goalScored;
+	}
+
 	@Override
 	public void beginContact(Contact contact) {
 
@@ -93,26 +110,6 @@ public class GameContactListener implements ContactListener {
 
 	}
 
-	// TODO Need to use collision detection instead of co-ordinates to check if
-	// ball is passing goalline
-	private boolean ballPassingGoalLine() {
-		boolean goalScored = false;
-		if (passGoalLineX() && passGoalLineY()) {
-			goalScored = true;
-		}
-		return goalScored;
-	}
-
-	private boolean passGoalLineY() {
-		return GameScreen.ball.body.getWorldCenter().y < (GameScreen.screenHeight / 6 + 4)
-				&& GameScreen.ball.body.getWorldCenter().y > -1;
-	}
-
-	private boolean passGoalLineX() {
-		return GameScreen.ball.body.getWorldCenter().x > (GameScreen.center.x - 30)
-				&& GameScreen.ball.body.getWorldCenter().x < (GameScreen.center.x + 30);
-	}
-
 	@Override
 	public void endContact(Contact contact) {
 		Fixture fixtureA = contact.getFixtureA();
@@ -134,22 +131,15 @@ public class GameContactListener implements ContactListener {
 					CollisionObjectType.Ball)) {
 
 				GameScreen.ballAtFeet = false;
+				Gdx.app.log("endContact", "user player kicked ball");
+			} else if (GameContactListener.checkIfCollisionIsOfCertainBodies(
+					bodyAInfo, bodyBInfo, CollisionObjectType.AIPlayer,
+					CollisionObjectType.Ball)) {
 
-				Gdx.app.log("endContact", "player kicked ball");
+				GameScreen.ballAtFeet = false;
+				Gdx.app.log("endContact", "ai player kicked ball");
 			}
 		}
-
-	}
-
-	@Override
-	public void preSolve(Contact contact, Manifold oldManifold) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void postSolve(Contact contact, ContactImpulse impulse) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -167,11 +157,26 @@ public class GameContactListener implements ContactListener {
 		return colInfo;
 	}
 
-	public static boolean checkIfCollisionIsOfCertainBodies(
-			CollisionInfo bodyAInfo, CollisionInfo bodyBInfo,
-			CollisionObjectType type1, CollisionObjectType type2) {
-		return (bodyAInfo.type == type1 && bodyBInfo.type == type2)
-				|| (bodyAInfo.type == type2 && bodyBInfo.type == type1);
+	private boolean passGoalLineX() {
+		return GameScreen.ball.body.getWorldCenter().x > (GameScreen.center.x - 30)
+				&& GameScreen.ball.body.getWorldCenter().x < (GameScreen.center.x + 30);
+	}
+
+	private boolean passGoalLineY() {
+		return GameScreen.ball.body.getWorldCenter().y < (GameScreen.screenHeight / 6 + 4)
+				&& GameScreen.ball.body.getWorldCenter().y > -1;
+	}
+
+	@Override
+	public void postSolve(Contact contact, ContactImpulse impulse) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void preSolve(Contact contact, Manifold oldManifold) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

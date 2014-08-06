@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -47,7 +48,9 @@ public class GameScreen implements Screen {
 	public static Map<Integer, Sprite> homeTeamTextureMap = new HashMap<Integer, Sprite>();
 	private static int PIXELS_PER_METER = 10;
 
+	public static Player playerWithBall;
 	public static int screenHeight;
+
 	public static Map<String, Sprite> textureMap = new HashMap<String, Sprite>();
 
 	private static final String TOP_GOAL = "TOP_GOAL";
@@ -81,28 +84,28 @@ public class GameScreen implements Screen {
 	}
 
 	private Texture aiPlayerTexture1;
-	private Texture aiPlayerTexture2;
 
+	private Texture aiPlayerTexture2;
 	private Texture aiPlayerTexture3;
 	private Texture aiPlayerTexture4;
 	private Texture aiPlayerTexture5;
 	private Texture aiPlayerTexture6;
 	private Texture aiPlayerTexture7;
 	private Texture ballTexture;
-	private Texture btmGoalTexture;
 
+	private Texture btmGoalTexture;
 	private final OrthographicCamera camera;
+
 	private GameContactListener contactListener;
 
 	private final Box2DDebugRenderer debugRenderer;
-
 	private final GaGa game;
+
 	private Texture grassTexture;
 
 	private Texture homePlayerTexture1;
 
 	private Texture homePlayerTexture2;
-
 	private Texture homePlayerTexture3;
 	private Texture homePlayerTexture4;
 	private Texture homePlayerTexture5;
@@ -115,6 +118,7 @@ public class GameScreen implements Screen {
 	private Texture topGoalTexture;
 	private World world;
 	private final float worldHeight;
+
 	// Used for Box2D
 	private final float worldWidth;
 
@@ -369,6 +373,45 @@ public class GameScreen implements Screen {
 		}
 	}
 
+	private void checkForBestAIPass() {
+		// get the best pass for the opposition
+		// if a player is further forward (ie. less in the y-direction)
+		// try pass to him, unless there is a 'home' team player in the line of
+		// the path, in which case pick the next best option
+		AIPlayer bestOption = null;
+
+		for (AIPlayer player : awayTeamPlayerMap.values()) {
+			// i.e. further up the pitch than the
+			// player with the ball
+			if (player.body.getWorldCenter().y < playerWithBall.body
+					.getWorldCenter().y) {
+				bestOption = player;
+
+				if (checkLineOfPassOK(bestOption)) {
+					passBallToPlayer(bestOption);
+					break;
+				}
+			}
+
+			// TODO more logic here, if no passes available pass backwards
+			// etc...
+		}
+	}
+
+	// check whether any of the home team players are in the line of the pass
+	private boolean checkLineOfPassOK(AIPlayer bestOption) {
+		boolean passOk = true;
+
+		for (UserPlayer userPlayer : homeTeamPlayerMap.values()) {
+			passOk = !Intersector.intersectSegmentCircle(
+					ball.body.getWorldCenter(),
+					bestOption.body.getWorldCenter(),
+					userPlayer.body.getWorldCenter(), 2);
+		}
+
+		return passOk;
+	}
+
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
@@ -439,6 +482,17 @@ public class GameScreen implements Screen {
 
 	}
 
+	private AIPlayer getPlayerThatHasBall() {
+		AIPlayer playerWithBall = null;
+		for (AIPlayer player : awayTeamPlayerMap.values()) {
+			if (player.getHasBall())
+				playerWithBall = player;
+			break;
+		}
+
+		return playerWithBall;
+	}
+
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
@@ -448,6 +502,16 @@ public class GameScreen implements Screen {
 	public void moveCamera(float x, float y) {
 		camera.position.set(x, y, 0);
 		camera.update();
+	}
+
+	// TODO: Pass the ball to the 'best option' - use X2- X1, Y2 - Y1...is this
+	// right?
+	private void passBallToPlayer(AIPlayer bestOption) {
+		Vector2 playerPos = bestOption.body.getWorldCenter();
+
+		GameScreen.moveBall(new Vector2(100 * (playerPos.x - ball.body
+				.getWorldCenter().x), 100 * (playerPos.y - ball.body
+				.getWorldCenter().y)));
 	}
 
 	@Override
@@ -490,6 +554,10 @@ public class GameScreen implements Screen {
 		updatePlayerSprites();
 
 		checkBallPosition();
+
+		if (!GameScreen.attacking && GameScreen.ballAtFeet)
+			checkForBestAIPass();
+
 		this.spriteBatch.end();
 
 		debugRenderer.render(world, camera.combined.scale(PIXELS_PER_METER,

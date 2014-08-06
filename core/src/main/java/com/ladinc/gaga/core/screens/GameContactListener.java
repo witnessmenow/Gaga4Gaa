@@ -74,6 +74,8 @@ public class GameContactListener implements ContactListener {
 				GameScreen.ballAtFeet = true;
 				GameScreen.ball.body.setLinearVelocity(new Vector2(0, 0));
 
+				GameScreen.playerWithBall = player;
+
 				Gdx.app.log("beginContact", "player got ball");
 
 			} else if (GameContactListener.checkIfCollisionIsOfCertainBodies(
@@ -173,10 +175,12 @@ public class GameContactListener implements ContactListener {
 		if (bodyAInfo.object.getClass() == UserPlayer.class
 				|| bodyAInfo.object.getClass() == AIPlayer.class) {
 			Player player = (Player) bodyAInfo.object;
+			Gdx.app.log("hasBall", "setting has ball to false");
 			player.setHasBall(false);
 		} else if (bodyBInfo.object.getClass() == UserPlayer.class
 				|| bodyBInfo.object.getClass() == AIPlayer.class) {
 			Player player = (Player) bodyAInfo.object;
+			Gdx.app.log("hasBall", "setting has ball to false");
 			player.setHasBall(false);
 		}
 	}

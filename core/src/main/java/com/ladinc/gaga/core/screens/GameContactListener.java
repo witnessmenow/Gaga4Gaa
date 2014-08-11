@@ -73,7 +73,7 @@ public class GameContactListener implements ContactListener {
 				player.setHasBall(true);
 				GameScreen.ballAtFeet = true;
 				GameScreen.ball.body.setLinearVelocity(new Vector2(0, 0));
-
+				GameScreen.delta = 0f;
 				GameScreen.playerWithBall = player;
 
 				Gdx.app.log("beginContact", "player got ball");
@@ -184,5 +184,4 @@ public class GameContactListener implements ContactListener {
 			player.setHasBall(false);
 		}
 	}
-
 }

@@ -42,13 +42,15 @@ public class GameScreen implements Screen {
 	public static Vector2 center = new Vector2();
 	// these maps will use the same key as the positionVectorMap
 	public static Map<Integer, Vector2> defendingPositionsMap = new HashMap<Integer, Vector2>();
+	public static float delta;
 	private static final String GRASS = "GRASS";
+
 	public static Map<Integer, UserPlayer> homeTeamPlayerMap = new HashMap<Integer, UserPlayer>();
-
 	public static Map<Integer, Sprite> homeTeamTextureMap = new HashMap<Integer, Sprite>();
-	private static int PIXELS_PER_METER = 10;
 
+	private static int PIXELS_PER_METER = 10;
 	public static Player playerWithBall;
+
 	public static int screenHeight;
 
 	public static Map<String, Sprite> textureMap = new HashMap<String, Sprite>();
@@ -84,41 +86,41 @@ public class GameScreen implements Screen {
 	}
 
 	private Texture aiPlayerTexture1;
-
 	private Texture aiPlayerTexture2;
 	private Texture aiPlayerTexture3;
 	private Texture aiPlayerTexture4;
 	private Texture aiPlayerTexture5;
 	private Texture aiPlayerTexture6;
 	private Texture aiPlayerTexture7;
-	private Texture ballTexture;
 
+	private Texture ballTexture;
 	private Texture btmGoalTexture;
+
 	private final OrthographicCamera camera;
 
 	private GameContactListener contactListener;
-
 	private final Box2DDebugRenderer debugRenderer;
+
 	private final GaGa game;
 
 	private Texture grassTexture;
 
 	private Texture homePlayerTexture1;
-
 	private Texture homePlayerTexture2;
 	private Texture homePlayerTexture3;
 	private Texture homePlayerTexture4;
 	private Texture homePlayerTexture5;
 	private Texture homePlayerTexture6;
 	private Texture homePlayerTexture7;
+	private final float localDelta = 0f;
 	Map<Integer, Vector2> positionVectorMap = new HashMap<Integer, Vector2>();
 	// Used for sprites etc
 	private final int screenWidth;
 	private final SpriteBatch spriteBatch;
 	private Texture topGoalTexture;
+
 	private World world;
 	private final float worldHeight;
-
 	// Used for Box2D
 	private final float worldWidth;
 
@@ -195,27 +197,27 @@ public class GameScreen implements Screen {
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER,
 						100), new Vector2((this.screenWidth - 150) / 2
 						/ PIXELS_PER_METER, 100), 8, camera);
-
-		AIPlayer player9 = new AIPlayer(world, new Vector2(
-				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 100),
-				new Vector2(((this.screenWidth - 200) / 2) * 2
-						/ PIXELS_PER_METER, 100), new Vector2(
-						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
-						100), 9, camera);
-
-		AIPlayer player10 = new AIPlayer(
-				world,
-				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER, 80),
-				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER, 80),
-				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER, 80),
-				10, camera);
-
-		AIPlayer player11 = new AIPlayer(
-				world,
-				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER, 80),
-				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER, 80),
-				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER, 80),
-				11, camera);
+		//
+		// AIPlayer player9 = new AIPlayer(world, new Vector2(
+		// ((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 100),
+		// new Vector2(((this.screenWidth - 200) / 2) * 2
+		// / PIXELS_PER_METER, 100), new Vector2(
+		// ((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
+		// 100), 9, camera);
+		//
+		// AIPlayer player10 = new AIPlayer(
+		// world,
+		// new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER, 80),
+		// new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER, 80),
+		// new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER, 80),
+		// 10, camera);
+		//
+		// AIPlayer player11 = new AIPlayer(
+		// world,
+		// new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER, 80),
+		// new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER, 80),
+		// new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER, 80),
+		// 11, camera);
 
 		awayTeamPlayerMap.put(1, player1);
 		awayTeamPlayerMap.put(2, player2);
@@ -225,9 +227,9 @@ public class GameScreen implements Screen {
 		awayTeamPlayerMap.put(6, player6);
 		awayTeamPlayerMap.put(7, player7);
 		awayTeamPlayerMap.put(8, player8);
-		awayTeamPlayerMap.put(9, player9);
-		awayTeamPlayerMap.put(10, player10);
-		awayTeamPlayerMap.put(11, player11);
+		// awayTeamPlayerMap.put(9, player9);
+		// awayTeamPlayerMap.put(10, player10);
+		// awayTeamPlayerMap.put(11, player11);
 
 	}
 
@@ -308,25 +310,25 @@ public class GameScreen implements Screen {
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER,
 						140), new Vector2((this.screenWidth - 150) / 2
 						/ PIXELS_PER_METER, 100), 8, camera);
-
-		UserPlayer player9 = new UserPlayer(world, new Vector2(
-				((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 100),
-				new Vector2(((this.screenWidth - 200) / 2) * 2
-						/ PIXELS_PER_METER, 140), new Vector2(
-						((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
-						100), 9, camera);
-
-		UserPlayer player10 = new UserPlayer(world, new Vector2(
-				(this.screenWidth + 100) / 2 / PIXELS_PER_METER, 120),
-				new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER,
-						160), new Vector2((this.screenWidth + 100) / 2
-						/ PIXELS_PER_METER, 120), 10, camera);
-
-		UserPlayer player11 = new UserPlayer(world, new Vector2(
-				(this.screenWidth - 100) / 2 / PIXELS_PER_METER, 120),
-				new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER,
-						160), new Vector2((this.screenWidth - 100) / 2
-						/ PIXELS_PER_METER, 120), 11, camera);
+		//
+		// UserPlayer player9 = new UserPlayer(world, new Vector2(
+		// ((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 100),
+		// new Vector2(((this.screenWidth - 200) / 2) * 2
+		// / PIXELS_PER_METER, 140), new Vector2(
+		// ((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
+		// 100), 9, camera);
+		//
+		// UserPlayer player10 = new UserPlayer(world, new Vector2(
+		// (this.screenWidth + 100) / 2 / PIXELS_PER_METER, 120),
+		// new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER,
+		// 160), new Vector2((this.screenWidth + 100) / 2
+		// / PIXELS_PER_METER, 120), 10, camera);
+		//
+		// UserPlayer player11 = new UserPlayer(world, new Vector2(
+		// (this.screenWidth - 100) / 2 / PIXELS_PER_METER, 120),
+		// new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER,
+		// 160), new Vector2((this.screenWidth - 100) / 2
+		// / PIXELS_PER_METER, 120), 11, camera);
 
 		homeTeamPlayerMap.put(1, player1);
 		homeTeamPlayerMap.put(2, player2);
@@ -336,9 +338,9 @@ public class GameScreen implements Screen {
 		homeTeamPlayerMap.put(6, player6);
 		homeTeamPlayerMap.put(7, player7);
 		homeTeamPlayerMap.put(8, player8);
-		homeTeamPlayerMap.put(9, player9);
-		homeTeamPlayerMap.put(10, player10);
-		homeTeamPlayerMap.put(11, player11);
+		// homeTeamPlayerMap.put(9, player9);
+		// homeTeamPlayerMap.put(10, player10);
+		// homeTeamPlayerMap.put(11, player11);
 	}
 
 	// Since the ball is a sensor, it will not 'hit' the walls, so we need ti
@@ -396,6 +398,13 @@ public class GameScreen implements Screen {
 			// TODO more logic here, if no passes available pass backwards
 			// etc...
 		}
+		if (bestOption == null) {
+			for (AIPlayer player : awayTeamPlayerMap.values()) {
+				if (checkLineOfPassOK(player)) {
+					passBallToPlayer(player);
+				}
+			}
+		}
 	}
 
 	// check whether any of the home team players are in the line of the pass
@@ -404,9 +413,8 @@ public class GameScreen implements Screen {
 
 		for (UserPlayer userPlayer : homeTeamPlayerMap.values()) {
 			passOk = !Intersector.intersectSegmentCircle(
-					ball.body.getWorldCenter(),
-					bestOption.body.getWorldCenter(),
-					userPlayer.body.getWorldCenter(), 2);
+					ball.body.getPosition(), bestOption.body.getPosition(),
+					userPlayer.body.getPosition(), 2);
 		}
 
 		return passOk;
@@ -507,6 +515,7 @@ public class GameScreen implements Screen {
 	// TODO: Pass the ball to the 'best option' - use X2- X1, Y2 - Y1...is this
 	// right?
 	private void passBallToPlayer(AIPlayer bestOption) {
+
 		Vector2 playerPos = bestOption.body.getWorldCenter();
 
 		GameScreen.moveBall(new Vector2(100 * (playerPos.x - ball.body
@@ -522,6 +531,8 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
+		GameScreen.delta += delta;
+
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
@@ -555,9 +566,12 @@ public class GameScreen implements Screen {
 
 		checkBallPosition();
 
-		if (!GameScreen.attacking && GameScreen.ballAtFeet)
+		Gdx.app.log("delta", "" + GameScreen.delta);
+		if (!GameScreen.attacking && GameScreen.ballAtFeet
+				&& GameScreen.delta > 1) {
+			GameScreen.delta = 0;
 			checkForBestAIPass();
-
+		}
 		this.spriteBatch.end();
 
 		debugRenderer.render(world, camera.combined.scale(PIXELS_PER_METER,

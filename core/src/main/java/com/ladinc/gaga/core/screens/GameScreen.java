@@ -310,25 +310,6 @@ public class GameScreen implements Screen {
 				new Vector2((this.screenWidth - 150) / 2 / PIXELS_PER_METER,
 						140), new Vector2((this.screenWidth - 150) / 2
 						/ PIXELS_PER_METER, 100), 8, camera);
-		//
-		// UserPlayer player9 = new UserPlayer(world, new Vector2(
-		// ((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER, 100),
-		// new Vector2(((this.screenWidth - 200) / 2) * 2
-		// / PIXELS_PER_METER, 140), new Vector2(
-		// ((this.screenWidth - 200) / 2) * 2 / PIXELS_PER_METER,
-		// 100), 9, camera);
-		//
-		// UserPlayer player10 = new UserPlayer(world, new Vector2(
-		// (this.screenWidth + 100) / 2 / PIXELS_PER_METER, 120),
-		// new Vector2((this.screenWidth + 100) / 2 / PIXELS_PER_METER,
-		// 160), new Vector2((this.screenWidth + 100) / 2
-		// / PIXELS_PER_METER, 120), 10, camera);
-		//
-		// UserPlayer player11 = new UserPlayer(world, new Vector2(
-		// (this.screenWidth - 100) / 2 / PIXELS_PER_METER, 120),
-		// new Vector2((this.screenWidth - 100) / 2 / PIXELS_PER_METER,
-		// 160), new Vector2((this.screenWidth - 100) / 2
-		// / PIXELS_PER_METER, 120), 11, camera);
 
 		homeTeamPlayerMap.put(1, player1);
 		homeTeamPlayerMap.put(2, player2);
@@ -338,9 +319,6 @@ public class GameScreen implements Screen {
 		homeTeamPlayerMap.put(6, player6);
 		homeTeamPlayerMap.put(7, player7);
 		homeTeamPlayerMap.put(8, player8);
-		// homeTeamPlayerMap.put(9, player9);
-		// homeTeamPlayerMap.put(10, player10);
-		// homeTeamPlayerMap.put(11, player11);
 	}
 
 	// Since the ball is a sensor, it will not 'hit' the walls, so we need ti
@@ -490,17 +468,6 @@ public class GameScreen implements Screen {
 
 	}
 
-	private AIPlayer getPlayerThatHasBall() {
-		AIPlayer playerWithBall = null;
-		for (AIPlayer player : awayTeamPlayerMap.values()) {
-			if (player.getHasBall())
-				playerWithBall = player;
-			break;
-		}
-
-		return playerWithBall;
-	}
-
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
@@ -512,8 +479,6 @@ public class GameScreen implements Screen {
 		camera.update();
 	}
 
-	// TODO: Pass the ball to the 'best option' - use X2- X1, Y2 - Y1...is this
-	// right?
 	private void passBallToPlayer(AIPlayer bestOption) {
 
 		Vector2 playerPos = bestOption.body.getWorldCenter();
@@ -560,13 +525,12 @@ public class GameScreen implements Screen {
 		updateSprite(textureMap.get(BALL), this.spriteBatch, PIXELS_PER_METER,
 				ball.body);
 
-		updateUserPlayerPositions();
-		updateAIPlayerPositions();
+		updatePlayerPositions(new ArrayList<Player>(homeTeamPlayerMap.values()));
+		updatePlayerPositions(new ArrayList<Player>(awayTeamPlayerMap.values()));
+
 		updatePlayerSprites();
 
 		checkBallPosition();
-
-		Gdx.app.log("delta", "" + GameScreen.delta);
 		if (!GameScreen.attacking && GameScreen.ballAtFeet
 				&& GameScreen.delta > 1) {
 			GameScreen.delta = 0;
@@ -622,75 +586,6 @@ public class GameScreen implements Screen {
 
 			}
 		}
-	}
-
-	public void setPlayerMovement(Player closestAwayPlayer) {
-		Vector2 ballPosition = this.ball.body.getWorldCenter();
-		Vector2 playerPosition = closestAwayPlayer.body.getWorldCenter();
-
-		Vector2 ballMovementDirection = this.ball.body.getLinearVelocity();
-
-		float ballSpeed = this.ball.body.getLinearVelocity().len();
-		float playerSpeed = new Vector2(Player.PLAYER_SPEED,
-				Player.PLAYER_SPEED).len();
-
-		Vector2 offsetToBall = new Vector2(ballPosition.x - playerPosition.x,
-				ballPosition.y - playerPosition.y);
-
-		float distanceFromPlayerToBallAtInterception = Math
-				.abs(ballMovementDirection.crs(offsetToBall));
-		float distanceBallTravelsToPassPlayer = -ballMovementDirection
-				.dot(offsetToBall);
-
-		float ballSpeerSqr = (float) Math.pow(ballSpeed, 2);
-		float playerSpeerSqr = (float) Math.pow(playerSpeed, 2);
-
-		float timeUntilBallPassesPlayer = ballSpeed == 0.0f ? 0.0f
-				: distanceBallTravelsToPassPlayer / ballSpeed;
-
-		Vector2 interceptionPosition = ballPosition.add(new Vector2(
-				ballMovementDirection.x * distanceBallTravelsToPassPlayer,
-				ballMovementDirection.y * distanceBallTravelsToPassPlayer));
-
-		float a = ballSpeerSqr - playerSpeerSqr;
-
-		float b = -2.0f
-				* (ballSpeerSqr * timeUntilBallPassesPlayer + playerSpeed);
-
-		float c = ballSpeerSqr * timeUntilBallPassesPlayer
-				* timeUntilBallPassesPlayer
-				+ distanceFromPlayerToBallAtInterception
-				* distanceFromPlayerToBallAtInterception;
-
-		float disc = (float) Math.pow(b, 2) - 4 * a * c;
-
-		Gdx.app.debug("Disc", "Disc" + disc);
-
-		float t1 = (float) (-b + Math.pow(disc, 0.5)) / (2 * a);
-		float t2 = (float) (-b - Math.pow(disc, 0.5)) / (2 * a);
-
-		float t = 0;
-
-		if (t1 < t2 && t1 > 0) {
-			t = t1;
-		} else if (t2 < t1 && t2 > 0) {
-			t = t2;
-		}
-
-		float aimX = (t * ball.body.getLinearVelocity().x)
-				+ ball.body.getWorldCenter().x;
-		float aimY = (t * ball.body.getLinearVelocity().y)
-				+ ball.body.getWorldCenter().y;
-
-		Vector2 interceptionPos = new Vector2(aimX, aimY);
-
-		Vector2 interceptDirection = getNormailesedMovementDirection(
-				playerPosition, interceptionPos);
-
-		closestAwayPlayer.body.setLinearVelocity(new Vector2(
-				interceptDirection.x * Player.PLAYER_SPEED,
-				interceptDirection.y * Player.PLAYER_SPEED));
-
 	}
 
 	private void setUpTextureMaps() {
@@ -772,19 +667,35 @@ public class GameScreen implements Screen {
 		addBall();
 	}
 
-	private void updateAIPlayerPositions() {
-		// if attacking is set, then the ai team are actually defending
-		ArrayList<Player> listAwayPlayers = new ArrayList<Player>(
-				awayTeamPlayerMap.values());
+	private void updatePlayerPositions(List<Player> listPlayers) {
+		// if attacking, players should run to attacking target positions, one
+		// per player
+		// if defending, closest player should run to ball, the rest should
+		// return to target position for defending,,
+		// which is their starting positions
 
-		resetClosePlayerBools(listAwayPlayers);
-		setClosestPlayerToBall(listAwayPlayers);
-		Player closestAwayPlayer = getClosestPlayer(listAwayPlayers);
+		listPlayers = new ArrayList<Player>(homeTeamPlayerMap.values());
 
-		if (attacking) { // defending
-			if (ballAtFeet) {
+		for (Player player : listPlayers) {
+			Vector2 linearVel;
 
+			// get closest player to ball
+			setClosestPlayerToBall(new ArrayList<Player>(
+					homeTeamPlayerMap.values()));
+
+			if (attacking && !player.getHasBall()) {
+				// pass in either the ball of the player target defending
+				// position, based on the 'isClosestToBall' boolean
+				linearVel = getAttackOrDefendingMovement(player, true);
+			} else {
+				// pass in either the ball or the player target defending
+				// position, based on the 'isClosestToBall' boolean
+				linearVel = getAttackOrDefendingMovement(player, false);
 			}
+
+			player.body.setLinearVelocity(
+					UserPlayer.PLAYER_SPEED * linearVel.x,
+					UserPlayer.PLAYER_SPEED * linearVel.y);
 		}
 	}
 
@@ -807,43 +718,5 @@ public class GameScreen implements Screen {
 					PIXELS_PER_METER, player.getValue().body);
 		}
 
-	}
-
-	private void updateUserPlayerPositions() {
-		// if attacking, players should run to attacking target positions, one
-		// per player
-		// if defending, closest player should run to ball, the rest should
-		// return to target position for defending,,
-		// which is their starting positions
-
-		List<Player> listPlayers = new ArrayList<Player>(
-				homeTeamPlayerMap.values());
-
-		for (Player player : listPlayers) {
-			Vector2 linearVel;
-
-			// get closest player to ball
-			setClosestPlayerToBall(new ArrayList<Player>(
-					homeTeamPlayerMap.values()));
-
-			// TODO: Should players move while they have the ball?
-			if (attacking && !player.getHasBall()) {
-				// pass in either the ball of the player target defending
-				// position, based on the 'isClosestToBall' boolean
-				linearVel = getAttackOrDefendingMovement(player, true);
-			} else {
-
-				// pass in either the ball or the player target defending
-				// position, based on the 'isClosestToBall' boolean
-				linearVel = getAttackOrDefendingMovement(player, false);
-			}
-
-			player.body.setLinearVelocity(
-					UserPlayer.PLAYER_SPEED * linearVel.x,
-					UserPlayer.PLAYER_SPEED * linearVel.y);
-
-			// player.body.setLinearVelocity(Player.PLAYER_SPEED,
-			// Player.PLAYER_SPEED);
-		}
 	}
 }

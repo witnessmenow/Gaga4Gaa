@@ -50,10 +50,6 @@ public class GameContactListener implements ContactListener {
 
 		if (bodyAInfo != null && bodyBInfo != null) {
 
-			Gdx.app.debug("beginContact",
-					"between " + bodyAInfo.type.toString() + " and "
-							+ bodyBInfo.type.toString());
-
 			if (GameContactListener.checkIfCollisionIsOfCertainBodies(
 					bodyAInfo, bodyBInfo, CollisionObjectType.UserPlayer,
 					CollisionObjectType.Ball)
@@ -76,7 +72,8 @@ public class GameContactListener implements ContactListener {
 				GameScreen.delta = 0f;
 				GameScreen.playerWithBall = player;
 
-				Gdx.app.log("beginContact", "player got ball");
+				Gdx.app.log("beginContact",
+						"player " + player.getPlayerNumber() + " got ball");
 
 			} else if (GameContactListener.checkIfCollisionIsOfCertainBodies(
 					bodyAInfo, bodyBInfo, CollisionObjectType.Wall,
@@ -102,6 +99,7 @@ public class GameContactListener implements ContactListener {
 
 	@Override
 	public void endContact(Contact contact) {
+
 		Fixture fixtureA = contact.getFixtureA();
 		Fixture fixtureB = contact.getFixtureB();
 
@@ -110,9 +108,6 @@ public class GameContactListener implements ContactListener {
 
 		if (bodyAInfo != null && bodyBInfo != null) {
 
-			Gdx.app.debug("endContact", "between " + bodyAInfo.type.toString()
-					+ " and " + bodyBInfo.type.toString());
-
 			if (checkIfCollisionIsOfCertainBodies(bodyAInfo, bodyBInfo,
 					CollisionObjectType.UserPlayer, CollisionObjectType.Ball)
 					|| GameContactListener.checkIfCollisionIsOfCertainBodies(
@@ -120,10 +115,19 @@ public class GameContactListener implements ContactListener {
 							CollisionObjectType.Ball)) {
 
 				setHasBallAtFeetFalse(bodyAInfo, bodyBInfo);
-				Gdx.app.log("endContact", "player kicked ball");
+
+				if (bodyAInfo.object.getClass() == UserPlayer.class
+						|| bodyAInfo.object.getClass() == AIPlayer.class) {
+					Player p = (Player) bodyAInfo.object;
+					Gdx.app.log("kick", "player " + p.getPlayerNumber()
+							+ " kicked ball");
+				} else {
+					Player p = (Player) bodyAInfo.object;
+					Gdx.app.log("kick", "player " + p.getPlayerNumber()
+							+ " kicked ball");
+				}
 			}
 		}
-
 	}
 
 	private CollisionInfo getCollisionInfoFromFixture(Fixture fix) {
@@ -175,12 +179,12 @@ public class GameContactListener implements ContactListener {
 		if (bodyAInfo.object.getClass() == UserPlayer.class
 				|| bodyAInfo.object.getClass() == AIPlayer.class) {
 			Player player = (Player) bodyAInfo.object;
-			Gdx.app.log("hasBall", "setting has ball to false");
+
 			player.setHasBall(false);
 		} else if (bodyBInfo.object.getClass() == UserPlayer.class
 				|| bodyBInfo.object.getClass() == AIPlayer.class) {
 			Player player = (Player) bodyAInfo.object;
-			Gdx.app.log("hasBall", "setting has ball to false");
+
 			player.setHasBall(false);
 		}
 	}

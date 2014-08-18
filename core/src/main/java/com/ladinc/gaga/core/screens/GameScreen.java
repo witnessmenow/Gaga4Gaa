@@ -338,6 +338,73 @@ public class GameScreen implements Screen {
 				screenHeight / 12), Line.sideLine); // right
 	}
 
+	private void applyAITextures() {
+		aiPlayerTexture1 = new Texture(Gdx.files.internal("playerRed1.png"));
+		awayTeamTextureMap.put(1, new Sprite(aiPlayerTexture1));
+
+		aiPlayerTexture2 = new Texture(Gdx.files.internal("playerRed2.png"));
+		awayTeamTextureMap.put(2, new Sprite(aiPlayerTexture2));
+
+		aiPlayerTexture3 = new Texture(Gdx.files.internal("playerRed3.png"));
+		awayTeamTextureMap.put(3, new Sprite(aiPlayerTexture3));
+
+		aiPlayerTexture4 = new Texture(Gdx.files.internal("playerRed4.png"));
+		awayTeamTextureMap.put(4, new Sprite(aiPlayerTexture4));
+
+		aiPlayerTexture5 = new Texture(Gdx.files.internal("playerRed5.png"));
+		awayTeamTextureMap.put(5, new Sprite(aiPlayerTexture5));
+
+		aiPlayerTexture6 = new Texture(Gdx.files.internal("playerRed6.png"));
+		awayTeamTextureMap.put(6, new Sprite(aiPlayerTexture6));
+
+		aiPlayerTexture7 = new Texture(Gdx.files.internal("playerRed7.png"));
+		awayTeamTextureMap.put(7, new Sprite(aiPlayerTexture7));
+	}
+
+	private void applyPitchAndGoalTextures() {
+		ballTexture = new Texture(Gdx.files.internal("ball.png"));
+		textureMap.put(BALL, new Sprite(ballTexture));
+
+		grassTexture = new Texture(Gdx.files.internal("grassMowed.png"));
+		textureMap.put(GRASS, new Sprite(grassTexture));
+
+		topGoalTexture = new Texture(Gdx.files.internal("top_goal.png"));
+		textureMap.put(TOP_GOAL, new Sprite(topGoalTexture));
+
+		btmGoalTexture = new Texture(Gdx.files.internal("btm_goal.png"));
+		textureMap.put(BTM_GOAL, new Sprite(btmGoalTexture));
+	}
+
+	private void applyUserPlayerTextures() {
+		homePlayerTexture1 = new Texture(
+				Gdx.files.internal("playerBlueShirt1.png"));
+		homeTeamTextureMap.put(1, new Sprite(homePlayerTexture1));
+
+		homePlayerTexture2 = new Texture(
+				Gdx.files.internal("playerBlueShirt2.png"));
+		homeTeamTextureMap.put(2, new Sprite(homePlayerTexture2));
+
+		homePlayerTexture3 = new Texture(
+				Gdx.files.internal("playerBlueShirt3.png"));
+		homeTeamTextureMap.put(3, new Sprite(homePlayerTexture3));
+
+		homePlayerTexture4 = new Texture(
+				Gdx.files.internal("playerBlueShirt4.png"));
+		homeTeamTextureMap.put(4, new Sprite(homePlayerTexture4));
+
+		homePlayerTexture5 = new Texture(
+				Gdx.files.internal("playerBlueShirt5.png"));
+		homeTeamTextureMap.put(5, new Sprite(homePlayerTexture5));
+
+		homePlayerTexture6 = new Texture(
+				Gdx.files.internal("playerBlueShirt6.png"));
+		homeTeamTextureMap.put(6, new Sprite(homePlayerTexture6));
+
+		homePlayerTexture7 = new Texture(
+				Gdx.files.internal("playerBlueShirt7.png"));
+		homeTeamTextureMap.put(7, new Sprite(homePlayerTexture7));
+	}
+
 	private void checkBallPosition() {
 		Vector2 position = ball.body.getWorldCenter();
 
@@ -423,16 +490,6 @@ public class GameScreen implements Screen {
 		}
 
 		return movement;
-	}
-
-	private Player getClosestPlayer(ArrayList<Player> playerList) {
-		for (Player player : playerList) {
-			if (player.isClosestPlayerToBall()) {
-
-				return player;
-			}
-		}
-		return null;
 	}
 
 	public Vector2 getNormailesedMovementDirection(Vector2 playerLocation,
@@ -542,8 +599,8 @@ public class GameScreen implements Screen {
 				PIXELS_PER_METER, PIXELS_PER_METER));
 	}
 
-	private void resetClosePlayerBools(ArrayList<Player> playerList) {
-		for (Player player : playerList) {
+	private void resetClosePlayerBools(List<Player> listPlayers) {
+		for (Player player : listPlayers) {
 			player.setClosestPlayerToBall(false);
 		}
 
@@ -565,12 +622,12 @@ public class GameScreen implements Screen {
 	// to the ball
 	// as he will be the only one drawn towards the ball when defending.
 	// This method will be used for both usrr and ai players
-	private void setClosestPlayerToBall(ArrayList<Player> playerList) {
+	private void setClosestPlayerToBall(List<Player> listPlayers) {
 		double minDist = 100000000; // some really high number so that at least
 									// one player will definitely be less than
 									// it
 
-		for (Player player : playerList) {
+		for (Player player : listPlayers) {
 			double distanceOfBallFromPlayer = ball
 					.getDistanceFromPlayer(player.body);
 			player.setDistFromBall(distanceOfBallFromPlayer);
@@ -580,7 +637,7 @@ public class GameScreen implements Screen {
 
 				// reset all 'IsClosestPlayerToBall' player values to false as
 				// there is a 'new' closest player value
-				resetClosePlayerBools(playerList);
+				resetClosePlayerBools(listPlayers);
 
 				player.setClosestPlayerToBall(true);
 
@@ -589,65 +646,11 @@ public class GameScreen implements Screen {
 	}
 
 	private void setUpTextureMaps() {
-		ballTexture = new Texture(Gdx.files.internal("ball.png"));
-		textureMap.put(BALL, new Sprite(ballTexture));
 
-		grassTexture = new Texture(Gdx.files.internal("grassMowed.png"));
-		textureMap.put(GRASS, new Sprite(grassTexture));
+		applyAITextures();
+		applyUserPlayerTextures();
 
-		aiPlayerTexture7 = new Texture(Gdx.files.internal("playerRed7.png"));
-		awayTeamTextureMap.put(7, new Sprite(aiPlayerTexture7));
-
-		aiPlayerTexture1 = new Texture(Gdx.files.internal("playerRed1.png"));
-		awayTeamTextureMap.put(1, new Sprite(aiPlayerTexture1));
-
-		aiPlayerTexture2 = new Texture(Gdx.files.internal("playerRed2.png"));
-		awayTeamTextureMap.put(2, new Sprite(aiPlayerTexture2));
-
-		aiPlayerTexture3 = new Texture(Gdx.files.internal("playerRed3.png"));
-		awayTeamTextureMap.put(3, new Sprite(aiPlayerTexture3));
-
-		aiPlayerTexture4 = new Texture(Gdx.files.internal("playerRed4.png"));
-		awayTeamTextureMap.put(4, new Sprite(aiPlayerTexture4));
-
-		aiPlayerTexture5 = new Texture(Gdx.files.internal("playerRed5.png"));
-		awayTeamTextureMap.put(5, new Sprite(aiPlayerTexture5));
-
-		aiPlayerTexture6 = new Texture(Gdx.files.internal("playerRed6.png"));
-		awayTeamTextureMap.put(6, new Sprite(aiPlayerTexture6));
-
-		homePlayerTexture7 = new Texture(Gdx.files.internal("playerRed7.png"));
-		homeTeamTextureMap.put(7, new Sprite(homePlayerTexture7));
-
-		homePlayerTexture1 = new Texture(
-				Gdx.files.internal("playerBlueShirt1.png"));
-		homeTeamTextureMap.put(1, new Sprite(homePlayerTexture1));
-
-		homePlayerTexture2 = new Texture(
-				Gdx.files.internal("playerBlueShirt2.png"));
-		homeTeamTextureMap.put(2, new Sprite(homePlayerTexture2));
-
-		homePlayerTexture3 = new Texture(
-				Gdx.files.internal("playerBlueShirt3.png"));
-		homeTeamTextureMap.put(3, new Sprite(homePlayerTexture3));
-
-		homePlayerTexture4 = new Texture(
-				Gdx.files.internal("playerBlueShirt4.png"));
-		homeTeamTextureMap.put(4, new Sprite(homePlayerTexture4));
-
-		homePlayerTexture5 = new Texture(
-				Gdx.files.internal("playerBlueShirt5.png"));
-		homeTeamTextureMap.put(5, new Sprite(homePlayerTexture5));
-
-		homePlayerTexture6 = new Texture(
-				Gdx.files.internal("playerBlueShirt6.png"));
-		homeTeamTextureMap.put(6, new Sprite(homePlayerTexture6));
-
-		topGoalTexture = new Texture(Gdx.files.internal("top_goal.png"));
-		textureMap.put(TOP_GOAL, new Sprite(topGoalTexture));
-
-		btmGoalTexture = new Texture(Gdx.files.internal("btm_goal.png"));
-		textureMap.put(BTM_GOAL, new Sprite(btmGoalTexture));
+		applyPitchAndGoalTextures();
 	}
 
 	@Override
@@ -673,17 +676,13 @@ public class GameScreen implements Screen {
 		// if defending, closest player should run to ball, the rest should
 		// return to target position for defending,,
 		// which is their starting positions
-
-		listPlayers = new ArrayList<Player>(homeTeamPlayerMap.values());
-
 		for (Player player : listPlayers) {
 			Vector2 linearVel;
 
 			// get closest player to ball
-			setClosestPlayerToBall(new ArrayList<Player>(
-					homeTeamPlayerMap.values()));
+			setClosestPlayerToBall(listPlayers);
 
-			if (attacking && !player.getHasBall()) {
+			if (!player.getHasBall()) {
 				// pass in either the ball of the player target defending
 				// position, based on the 'isClosestToBall' boolean
 				linearVel = getAttackOrDefendingMovement(player, true);
